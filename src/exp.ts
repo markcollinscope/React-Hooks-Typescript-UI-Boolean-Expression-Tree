@@ -28,16 +28,17 @@ const ERROR = 'error';
 export const APP_ERROR = Symbol(ERROR);	// every calls to Symbol(ERROR) is guaranteed to return a UNIQUE symbol.
 class AppError
 {
-	private errCode = APP_ERROR;
+	private errCode: symbol;
+	private message: string;
 
-	constructor(code: number = AppError.APP_ERROR, message: string = "basic application programming error")
+	constructor(code: symbol = APP_ERROR, message: string = "basic application programming error")
 	{
 		this.errCode = code;
 		this.message = message
 	}
 	code = () => this.errCode;
 	msg = () => this.message;
-}-
+}
 
 export const NO_EVAL_ERROR = Symbol(ERROR);
 class NoEvalError extends AppError
@@ -48,19 +49,19 @@ class NoEvalError extends AppError
 	}
 }
 
-class Exp  
+class Boulangerie  
 {
-	name = (): string | never => throw new AppError();
-	eval = (): number | never => throw new AppError();
+	name = (): string | never => { throw new AppError(); }
+	eval = (): boolean | never => { throw new AppError(); } // TODO check never;
 }
 
-class UndefExp extends Exp
+class UndefBoulangerie extends Boulangerie
 {
 	name = (): string => return 'Undef';
 	eval = (): boolean | never => { throw NoEvalError(); } 
 }
 
-class ConstExp extends Exp
+class ConstBoulangerie extends Boulangerie
 {
 	private value = undefined;
 
@@ -73,11 +74,11 @@ class ConstExp extends Exp
 	name = () => this.value ? 'true' : 'false';
 }
 
-Type UniOpType = 'NOT | SAME'
-const UniOpExp extends Exp
+Type UniOpType = 'NOT' | 'SAME'
+const UniOpBoulangerie extends Boulangerie
 {
 	private subType: UniOpType = undefined;
-	private subExp: Exp = undefined; // ???
+	private subBoulangerie: Boulangerie = undefined; // ???
 }
 
 
