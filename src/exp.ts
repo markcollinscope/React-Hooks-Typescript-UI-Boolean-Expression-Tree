@@ -23,8 +23,14 @@ Delete:
 // This module does not deal with UI as it is part of the business logic of the application.
 // It is, of course, used by the UI code to create, modify and calcuate the expressions contained herein.
 
+// ease change of formatting
 export const LB = '(';
 export const RB = ')';
+export const DIV = ',';
+export const TRUE = 'TRUE';
+export const FALSE = 'FALSE';
+export const UNDEF = 'UNDEF';
+export const NOT = 'NOT';
 
 export const APP_ERROR = Symbol('app-error');	// every calls to Symbol(value) is guaranteed to return a UNIQUE symbol, even if value is
 export class AppError
@@ -52,14 +58,14 @@ export class NoEvalError extends AppError
 
 export class Exp  
 {
-	name = (): undefined | string | never => { throw new AppError(); }
-	expand = (): undefined | string | never => { throw new AppError(); }
-	calc = (): undefined | boolean | never => { throw new AppError(); } // TODO check never;
+	name = (): string | never => { throw new AppError(); }
+	expand = (): string | never => { throw new AppError(); }
+	calc = (): boolean | never => { throw new AppError(); } // TODO check never;
 }
 
 export class UndefExp extends Exp
 {
-	name = (): string => 'Undef';
+	name = (): string => UNDEF;
 	expand = () => this.name();
 	calc = (): boolean | never => { throw new NoEvalError(); } 
 }
@@ -68,60 +74,48 @@ export const undefExp = new UndefExp();
 
 export class ConstExp extends Exp
 {
-	private value: boolean = true;
-
-	constructor(val: boolean)
+	constructor(private value: boolean)
 	{
 		super();
-		this.value = val;
 	}
 
 	calc = () => this.value;
-	name = () => this.value ? 'TRUE' : 'FALSE';
+	name = () => this.value ? TRUE : FALSE;
 	expand = () => this.name();
 }
 
 export const trueExp = new ConstExp(true);
-export const falseExp = new ConstExp(true);
+export const falseExp = new ConstExp(false);
 
 export class NotExp extends Exp
 {
-	private subExp: Exp = undefExp;
-
-	constructor(subExp: Exp = undefExp)
+	constructor(private subExp: Exp = undefExp)
 	{
 		super()
-		this.subExp = subExp;
 	}
 
 	calc = (): boolean => ! this.subExp.calc();
-	name = (): string => 'NOT'
+	name = (): string => NOT
 	expand = () => this.name() + LB + this.subExp.expand() + RB;
 }
 
 export const AND = 'AND';
 export const OR = 'OR';
-export type OpType = AND | OR ;
+export type BinOpType = typeof AND | typeof OR ;
 
 export class BinExp extends Exp
 {
-	static evalFn =
+	static calcFn =
 	{
 		AND: (lh: Exp, rh: Exp) => lh.calc() && rh.calc(),
-		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc(),
+		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc()
 	}
-	private lhSubExp: 	Exp | undefined = undefined;
-	private rhSubExp: 	Exp | undefined = undefined;
-	private op: 		string | undefined = undefined; 
-
-	constructor(op: OpType, lhs = undefExp, rhs = undefExp)
+	constructor(private op: BinOpType, private lhs = undefExp, private rhs = undefExp)
 	{
 		super();
-		this.op = op;
-		this.lhSubExp = lhs;
-		this.rhSubExp = rhs;
 	}
 	name = () => this.op;
-	calc = () => BinExp.evalFn[this.op]( this.lhSubExp.calc(), this.rhSubExp.calc() );
-	expand = () => this.name() + LB + this.lhSubExp.expand() + this.rhSubExp.expand() + RB;
+	calc = () => BinExp.calcFn[this.op]( this.lhs, this.rhs );
+	expand = () => this.name() + LB + this.lhs.expand() + DIV + this.rhs.expand() + RB;
 }
+
