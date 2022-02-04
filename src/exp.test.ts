@@ -78,7 +78,7 @@ describe(`test basic type creation`, function()
 				// default second arg to UndefExp ...UndefExp
 			);
 
-		expect( () => e.calc() ).toThrow(exp.AppError);
+		expect( () => e.calc() ).toThrow(exp.NoEvalError);
 	});
 	
 	it('** Deeper nested expression expands to string correctly', function() 
