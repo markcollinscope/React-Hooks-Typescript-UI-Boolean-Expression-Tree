@@ -17,7 +17,7 @@ interface Props
 
 class State
 {
-	constructor(public parentExp: Exp, public canRender: boolean) {}	// check canRender - TODO
+	constructor(public rootExp: Exp, public canRender: boolean) {}	// check canRender - TODO
 };
 
 const dropDownCbs =
@@ -29,7 +29,7 @@ const dropDownCbs =
 };
 
 /* HERE! HERE! TODO
-	parentExp - parent of current expression to be shown - for App - this is 'dummy parent',
+	rootExp - parent of current expression to be shown - for App - this is 'dummy parent',
 	to enable the App root Exp to be modified.
     
     (App)     (type and dropdown)
@@ -52,14 +52,9 @@ export class ExpView extends React.Component<Props, State>
 	{
 		if (!this.state.canRender) return <p>Loading...</p>
 
-		const parentExp = this.state.parentExp;
-		const parentExpTypeName = parentExp.name();
-
-		const isUniExp = parentExp instanceof NotExp;
-		const isBinExp = parentExp instanceof BinExp;
+		const isUniExp = this.props.exp instanceof NotExp;
+		const isBinExp = this.props.exp instanceof BinExp;
 		
-		lg("Root: ", parentExpTypeName);
-	
 		let expReturn = 
 			<div className='bdr stdfont expwidth'>
 			<BoolView 
@@ -67,7 +62,7 @@ export class ExpView extends React.Component<Props, State>
 			/>
 			</div>
 		
-		// let expReturn = <p className='bdr stdfont expwidth'>{parentExpTypeName}</p> TODO.
+		// let expReturn = <p className='bdr stdfont expwidth'>{rootExpTypeName}</p> TODO.
 
 		if (isUniExp)
 		{
@@ -108,12 +103,12 @@ export class ExpView extends React.Component<Props, State>
 	}
 }
 
-// if (parentExp instanceof BinExp) //TODO
+// if (rootExp instanceof BinExp) //TODO
 		// {
 		// 	isBinExp = true;
 		// 	lg('bin exp')
 		// }
-		// else if (parentExp instanceof NotExp) //TODO
+		// else if (rootExp instanceof NotExp) //TODO
 		// {
 		// 	isUniExp = true;
 		// 	lg('uni exp')
@@ -123,15 +118,15 @@ export class ExpView extends React.Component<Props, State>
 		// 	lg('const')
 		// }
 
-		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(parentExpTypeName) )
+		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(rootExpTypeName) )
 		// {
-		// 	expTxt = parentExpTypeName
+		// 	expTxt = rootExpTypeName
 
 		// 	lg('const')
 		// }
-		// else if (parentExpTypeName === new NotExp().name()) //TODO
+		// else if (rootExpTypeName === new NotExp().name()) //TODO
 		// {
-		// 	expTxt = parentExpTypeName
+		// 	expTxt = rootExpTypeName
 		// 	isUniExp = true;
 
 		// 	lg('uni exp')
