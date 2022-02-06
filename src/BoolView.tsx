@@ -2,21 +2,26 @@ import * as React from 'react';
 
 // import { Exp } from './Exp';
 
+export type OptionCbs = {[index: string]: (s: string) => void};
+
 interface Props
 {	
-	optionNames:	string[] 
-	onSelect:		(n: number) => void;
+	optionCbs:	OptionCbs;
 }
 
 export function BoolView(props: Props)
 {
+
+	const optionNames = Object.keys(props.optionCbs);
+	
 	// naughty ... (any)
 	const handleSelect = (event: any): void =>
 	{
 		event.preventDefault();
 		let value = parseInt(event.target.value) as number;
 
-		props.onSelect(value);
+		const optionChosen = optionNames[value];
+		props.optionCbs[optionChosen](optionChosen);
 	}
 
 	const createOption = (s: string, k: number) =>
@@ -24,7 +29,7 @@ export function BoolView(props: Props)
 		return (
 			<option 
 				//
-				className={'optionTxt'}
+				className={'optiontxt'}
 				key={k}
 				value={k}
 			> 
@@ -34,11 +39,11 @@ export function BoolView(props: Props)
 	}
 
 	return (
-		<select className='optionTxt'
+		<select className='optiontxt'
 			size={1} 
 			onChange={handleSelect}
 		>
-			{ props.optionNames.map(createOption) }
+			{ optionNames.map(createOption) }
 		</select>
 	);
 }

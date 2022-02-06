@@ -2,19 +2,12 @@ import React from 'react';
 
 import { lg } from './utils'
 
-import { Exp, BinExp, NotExp, undefExp, trueExp, falseExp, UNI, LHS, RHS } from './Exp';
-import { BoolView } from './BoolView';
+import { Exp, BinExp, NotExp, undefExp, trueExp, falseExp, UNI, LHS, RHS, AND } from './Exp';
+import { BoolView, OptionCbs } from './BoolView';
 
-export * from './Exp';
+export * from './Exp';	// TODO Redact.
 
-const nullFn = (n: number) => {}
-
-const textCb =
-[
-	{ true: 	nullFn },
-	{ "false":	nullFn }, 
-	{ "and":	nullFn }
-];
+const tstFn = (s: string): void  => { lg("Menu: ", s) }
 
 interface Props
 {
@@ -24,8 +17,28 @@ interface Props
 
 class State
 {
-	constructor(public rootExp: Exp, public canRender: boolean) {}	// check canRender - TODO
+	constructor(public parentExp: Exp, public canRender: boolean) {}	// check canRender - TODO
 };
+
+const dropDownCbs =
+{
+	"undef":	(s: string) => { lg(s); return undefExp; },
+	"true": 	(s: string) => { lg(s); return trueExp; },
+	"false": 	(s: string) => { lg(s); return falseExp; },
+	"and":		(s: string) => { lg(s); return new BinExp(AND); }
+};
+
+/* HERE! HERE! TODO
+	parentExp - parent of current expression to be shown - for App - this is 'dummy parent',
+	to enable the App root Exp to be modified.
+    
+    (App)     (type and dropdown)
+    dummyExp ---> xxxExp --------------------> xxxExp ... etc.
+                    |------------------------> exxExp ... etc.     
+	
+	selecting a new option (from the dropdown menu on all Exp nodes) changes
+	
+*/
 
 export class ExpView extends React.Component<Props, State>
 {
@@ -39,27 +52,22 @@ export class ExpView extends React.Component<Props, State>
 	{
 		if (!this.state.canRender) return <p>Loading...</p>
 
-		const rootExp = this.state.rootExp;
-		const rootExpTypeName = rootExp.name();
+		const parentExp = this.state.parentExp;
+		const parentExpTypeName = parentExp.name();
 
-		const isUniExp = rootExp instanceof NotExp;
-		const isBinExp = rootExp instanceof BinExp;
+		const isUniExp = parentExp instanceof NotExp;
+		const isBinExp = parentExp instanceof BinExp;
 		
-		lg("Root: ", rootExpTypeName)
-
-		const narr = textCb.forEach( (v) => Object.keys(v) );
-		
-		lg("narr:", narr)
+		lg("Root: ", parentExpTypeName);
 	
 		let expReturn = 
 			<div className='bdr stdfont expwidth'>
 			<BoolView 
-				optionNames={ ['a','b'] }  //{narr}
-				onSelect={nullFn}
+				optionCbs={ dropDownCbs }
 			/>
 			</div>
 		
-		// let expReturn = <p className='bdr stdfont expwidth'>{rootExpTypeName}</p>
+		// let expReturn = <p className='bdr stdfont expwidth'>{parentExpTypeName}</p> TODO.
 
 		if (isUniExp)
 		{
@@ -73,6 +81,7 @@ export class ExpView extends React.Component<Props, State>
 					/>
 				</div>
 		}
+	
 		if (isBinExp)
 		{
 			expReturn = 
@@ -99,12 +108,12 @@ export class ExpView extends React.Component<Props, State>
 	}
 }
 
-// if (rootExp instanceof BinExp) //TODO
+// if (parentExp instanceof BinExp) //TODO
 		// {
 		// 	isBinExp = true;
 		// 	lg('bin exp')
 		// }
-		// else if (rootExp instanceof NotExp) //TODO
+		// else if (parentExp instanceof NotExp) //TODO
 		// {
 		// 	isUniExp = true;
 		// 	lg('uni exp')
@@ -114,15 +123,15 @@ export class ExpView extends React.Component<Props, State>
 		// 	lg('const')
 		// }
 
-		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(rootExpTypeName) )
+		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(parentExpTypeName) )
 		// {
-		// 	expTxt = rootExpTypeName
+		// 	expTxt = parentExpTypeName
 
 		// 	lg('const')
 		// }
-		// else if (rootExpTypeName === new NotExp().name()) //TODO
+		// else if (parentExpTypeName === new NotExp().name()) //TODO
 		// {
-		// 	expTxt = rootExpTypeName
+		// 	expTxt = parentExpTypeName
 		// 	isUniExp = true;
 
 		// 	lg('uni exp')
