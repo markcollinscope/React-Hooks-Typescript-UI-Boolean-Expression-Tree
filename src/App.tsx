@@ -32,7 +32,6 @@ function App()
 
 	try {
 		result  = initExp.calc() ? 'TRUE' : 'FALSE'
-		textExp = initExp.expand();
 	}
 	catch (e)
 	{
@@ -40,12 +39,14 @@ function App()
 		if (e instanceof NoEvalError) result = undefExp.name();
 	}
 
+	textExp = initExp.expand();
+
 	return (
 		<div className="App">
 			<header className="App-header tac botmargin">
 				De-luxe Boolean Expression Calculator
 				<p className='smfont'>for all your boolean evaluation needs</p>
-				<p className='smfont'>please UPGRADE to paid edition (only EU99.99/month) to access XOR functionality</p>
+				<p className='smfont'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
 			</header>
 
 			<div className='tal lgfont flex-horiz'>
@@ -63,7 +64,6 @@ function App()
 			/>
 		</div>
 	);
-
 }
 
 export default App;

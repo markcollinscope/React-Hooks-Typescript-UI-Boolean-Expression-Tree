@@ -3,7 +3,18 @@ import React from 'react';
 import { lg } from './utils'
 
 import { Exp, BinExp, NotExp, undefExp, trueExp, falseExp, UNI, LHS, RHS } from './Exp';
+import { BoolView } from './BoolView';
+
 export * from './Exp';
+
+const nullFn = (n: number) => {}
+
+const textCb =
+[
+	{ true: 	nullFn },
+	{ "false":	nullFn }, 
+	{ "and":	nullFn }
+];
 
 interface Props
 {
@@ -13,7 +24,7 @@ interface Props
 
 class State
 {
-	constructor(public rootExp: Exp, public canRender: boolean) {}
+	constructor(public rootExp: Exp, public canRender: boolean) {}	// check canRender - TODO
 };
 
 export class ExpView extends React.Component<Props, State>
@@ -35,8 +46,20 @@ export class ExpView extends React.Component<Props, State>
 		const isBinExp = rootExp instanceof BinExp;
 		
 		lg("Root: ", rootExpTypeName)
+
+		const narr = textCb.forEach( (v) => Object.keys(v) );
+		
+		lg("narr:", narr)
 	
-		let expReturn = <p className='bdr stdfont expwidth'>{rootExpTypeName}</p>
+		let expReturn = 
+			<div className='bdr stdfont expwidth'>
+			<BoolView 
+				optionNames={ ['a','b'] }  //{narr}
+				onSelect={nullFn}
+			/>
+			</div>
+		
+		// let expReturn = <p className='bdr stdfont expwidth'>{rootExpTypeName}</p>
 
 		if (isUniExp)
 		{
@@ -57,17 +80,17 @@ export class ExpView extends React.Component<Props, State>
 					{expReturn}
 					<div className='vgap'/>
 					<div className='lhsmargin'>
-					<ExpView
-						exp={this.props.exp.sub(LHS)}
-						onUpdate={this.props.onUpdate}
-					/>
+						<ExpView
+							exp={this.props.exp.sub(LHS)}
+							onUpdate={this.props.onUpdate}
+						/>
 					</div>
 					<div className='vgap'/>
 					<div className='lhsmargin'>
-					<ExpView 
-						exp={this.props.exp.sub(RHS)}
-						onUpdate={this.props.onUpdate}
-					/>
+						<ExpView 
+							exp={this.props.exp.sub(RHS)}
+							onUpdate={this.props.onUpdate}
+						/>
 					</div>
 				</div>
 		}
