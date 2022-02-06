@@ -1,6 +1,6 @@
 
 import {
-	AND, OR, Exp, BinExp, falseExp, trueExp, NOT, UNDEF, AppError, NoEvalError, UndefExp, NotExp, ConstExp, LB, RB, DIV, TRUE, FALSE
+	AND, OR, Exp, BinExp, falseExp, trueExp, NOT, UNDEF, AppError, NoEvalError, undefExp, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
 const assert = (v: boolean)  => { if (!v) throw 'error'; }
@@ -16,19 +16,19 @@ describe(`test basic type creation`, function()
 
 	it('** undefined expression throw no-eval error on calc', function()
 	{
-		expect( () => new UndefExp().calc() ).toThrow(NoEvalError);
+		expect( () => undefExp.calc() ).toThrow(NoEvalError);
 	});
 
 	it('** true/false constants to evaluate correctly', function()
 	{
-		assert( new ConstExp(true).calc() );
-		assert( ! new ConstExp(false).calc() );
+		assert( trueExp.calc() );
+		assert( ! falseExp.calc() );
 	});
 
 	it('** Not (Uni) expression evaluates correctly', function()
 	{
-		assert( new NotExp(new ConstExp (false)).calc() );
-		assert( ! new NotExp(new ConstExp (true)).calc() );
+		assert( new NotExp(falseExp).calc() );
+		assert( ! new NotExp(trueExp).calc() );
 	});
 
 	it('** Not expression expands (to string representation) correctly', function()
@@ -63,8 +63,8 @@ describe(`test basic type creation`, function()
 	{
 		const t = trueExp.name();
 
-		assert( new BinExp( AND, trueExp, trueExp ).expand() === AND + LB + t + DIV + t + RB);
-		assert( new BinExp( OR, trueExp, trueExp ).expand() === OR + LB + t + DIV + t + RB);
+		assert( new BinExp( AND, trueExp, trueExp ).expand() === AND + LB + t + SEPERATOR + t + RB);
+		assert( new BinExp( OR, trueExp, trueExp ).expand() === OR + LB + t + SEPERATOR + t + RB);
 	});
 
 	it('** Deeper nested expression with UNDEF throws exception', function() 
@@ -97,7 +97,7 @@ describe(`test basic type creation`, function()
 			);
 		
 		// AND(OR(TRUE,FALSE),NOT(FALSE))
-		assert( e.expand() === AND + LB + OR + LB + TRUE + DIV + FALSE + RB + DIV + NOT + LB + FALSE + RB + RB );
+		assert( e.expand() === AND + LB + OR + LB + TRUE + SEPERATOR + FALSE + RB + SEPERATOR + NOT + LB + FALSE + RB + RB );
 	});
 
 	it('** Deeper nested expression evaluates correctly', function() 

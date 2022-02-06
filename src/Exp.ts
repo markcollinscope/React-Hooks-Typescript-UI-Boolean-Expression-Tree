@@ -28,54 +28,48 @@ import { lg } from './utils';
 
 export const LB = '(';
 export const RB = ')';
-export const DIV = ',';
-export const TRUE = 'TRUE';
-export const FALSE = 'FALSE';
-export const UNDEF = 'UNDEF';
-export const NOT = 'NOT';
+export const SEPERATOR = ',';
 
-export const APP_ERROR = 'app-error';	// every calls to Symbol(value) is guaranteed to return a UNIQUE symbol, even if value is
-export class AppError
+export class AppError extends Error
 {
-	private errCode: string;
-	private message: string;
-
-	constructor(code: string = APP_ERROR, message: string = "basic application programming error")
+	constructor(message: string = "basic application programming error") 
 	{
-		this.errCode = code;
-		this.message = message
+		super(message);
 	}
-	code = () => this.errCode;
-	msg = () => this.message;
 }
 
-export const NO_EVAL_ERROR = 'no-calc-error';
 export class NoEvalError extends AppError
 {
 	constructor(message: string = "cannot calcuate expression")
 	{
-		super(NO_EVAL_ERROR, message);
+		super(message);
 	}
 }
 
 export class Exp  
 {
-	sub = (t: string): Exp | never => { throw new AppError(); }
+	sub = (op: string): Exp | never => { throw new AppError(); }
 	name = (): string | never => { throw new AppError(); }
 	expand = (): string | never => { throw new AppError(); }
 	calc = (): boolean | never => { throw new AppError(); } // TODO check never;
 }
 
-export class UndefExp extends Exp
+export const UNDEF = 'UNDEF';
+class UndefExp extends Exp // no export - immutable Undef Exp value created and exported.
 {
-	name = (): string => UNDEF;
+	name = () => UNDEF;
 	expand = () => this.name();
-	calc = (): boolean | never => { throw new NoEvalError(); } 
+	calc = (): boolean | never => 
+	{ 
+		// throwing exception saves hassle dealing with UNDEF left, right and centre during bool op evaluation.
+		throw new NoEvalError(); 
+	} 
 }
+export const undefExp = new UndefExp(); // todo: rename
 
-export const undefExp = new UndefExp();
-
-export class ConstExp extends Exp
+export const TRUE = 'TRUE';
+export const FALSE = 'FALSE';
+class ConstExp extends Exp // no export - T, F immutable Exp values created and exported.
 {
 	constructor(private value: boolean)
 	{
@@ -86,52 +80,55 @@ export class ConstExp extends Exp
 	name = () => this.value ? TRUE : FALSE;
 	expand = () => this.name();
 }
-
 export const trueExp = new ConstExp(true);
 export const falseExp = new ConstExp(false);
 
-
-export const UNI = 'UNI'
-export class NotExp extends Exp
+// no export - Binary (AND,OR) and NOT Exp classes exported.
+class CompoundExp extends Exp 
 {
-	constructor(private subExp: Exp = undefExp)
-	{
-		super()
-	}
-
-	sub = (t: string) => this.subExp;
-	calc = (): boolean => ! this.subExp.calc();
-	name = (): string => NOT
-	expand = () => this.name() + LB + this.subExp.expand() + RB;
+	private subexp: { [index: string] : Exp } = {};
+	
+	sub = (op: string) => this.subexp[op];
+	setsub 	= (op: string, v: Exp) => this.subexp[op] = v;
 }
 
-export const AND = 'AND';
-export const OR = 'OR';
-export type BinOpType = typeof AND | typeof OR;
+export const UNI = 'UNI'; // todo: rename. deprecate, use NOT
+export const NOT = 'NOT';
+export class NotExp extends CompoundExp
+{
+	constructor(subExp: Exp = undefExp)
+	{
+		super()
+		this.setsub(NOT, subExp)
+	}
+
+	calc = (): boolean => ! this.sub(NOT).calc();
+	name = (): string => NOT
+	expand = () => this.name() + LB + this.sub(NOT).expand() + RB;
+}
 
 export const LHS = 'LHS'
 export const RHS = 'RHS'
-
-export class BinExp extends Exp
+export const AND = 'AND';
+export const OR = 'OR';
+export class BinExp extends CompoundExp
 {
-	private subexps: { [key: string] : Exp } = {};
-
-	static calcFn = // extensible approach - add 'NAND' - just follow the pattern!
+	static calcFn: { [index: string]: (lh: Exp, rh: Exp) => boolean} = // extensible approach - add 'NAND' - just follow the pattern!
 	{
 		AND: (lh: Exp, rh: Exp) => lh.calc() && rh.calc(),
 		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc()
 	}
 
-	constructor(private op: BinOpType, lhs = undefExp, rhs = undefExp)
+	constructor(private op: string, lhs = undefExp, rhs = undefExp)
 	{
 		super();
-		this.subexps[LHS] = lhs;
-		this.subexps[RHS] = rhs;
+		this.setsub(LHS,lhs);
+		this.setsub(RHS, rhs);
 	}
-	sub = (t: string) => this.subexps[t];
+
 	name = () => this.op;
-	calc = () => BinExp.calcFn[this.op]( this.subexps[LHS], this.subexps[RHS] );
-	expand = () => this.name() + LB + this.subexps[LHS].expand() + DIV + this.subexps[RHS].expand() + RB;
+	calc = () => BinExp.calcFn[this.op]( this.sub(LHS), this.sub(RHS) );
+	expand = () => this.name() + LB + this.sub(LHS).expand() + SEPERATOR + this.sub(RHS).expand() + RB;
 }
 
 // TODO: check out exception capture by type!
