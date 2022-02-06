@@ -1,0 +1,63 @@
+body {
+	background-color: black;
+}
+
+p {
+	margin: 0;
+}
+
+.App {
+	text-align: center;
+	background: black;
+	color: yellow;
+	padding-left: 1vw;
+}
+
+.App-header {
+	align-items: center;
+	justify-content: center;
+	color: red;
+}
+
+.botmargin {
+	margin-bottom: 3vh;
+}
+
+.tal {
+	text-align: left;
+}
+
+.tac {
+	text-align: center;
+}
+
+.bdr {
+	border: solid 1px yellow;
+	margin: 1px;
+}
+
+.smfont {
+	font-size: .8vw;
+}
+
+.stdfont {
+	font-size: 1vw
+}
+
+.lgfont {
+	font-size: 1.4vw	
+}
+
+.expwidth {
+	width: 10vw;
+}
+
+.lhsmargin {
+	margin-left: 10vw;
+}
+
+.flex-horiz {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: left;
+}

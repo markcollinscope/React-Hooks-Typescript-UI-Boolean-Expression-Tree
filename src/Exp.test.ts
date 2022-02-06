@@ -1,7 +1,7 @@
 
 import {
 	AND, OR, Exp, BinExp, falseExp, trueExp, NOT, UNDEF, AppError, NoEvalError, UndefExp, NotExp, ConstExp, LB, RB, DIV, TRUE, FALSE
-} from './exp'
+} from './Exp'
 
 const assert = (v: boolean)  => { if (!v) throw 'error'; }
 
