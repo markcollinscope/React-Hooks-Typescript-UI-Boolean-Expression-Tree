@@ -1,33 +1,33 @@
 import * as React from 'react';
 
-// import { Exp } from './Exp';
-
-export type OptionCbs = {[index: string]: (s: string) => void};
+import { Exp } from './Exp';
 
 interface Props
 {	
-	optionCbs:	OptionCbs;
+	onSelect:	(v: string) => void;
+	options:	string[];
+	selected:	string;
 }
 
 export function BoolView(props: Props)
 {
-
-	const optionNames = Object.keys(props.optionCbs);
+	const optionNames = props.options;
+	const selectedItem = optionNames.indexOf(props.selected);
 	
-	// naughty ... (any)
+	// naughty ... (the 'any' - forgive me!)
 	const handleSelect = (event: any): void =>
 	{
 		event.preventDefault();
 		let value = parseInt(event.target.value) as number;
 
 		const optionChosen = optionNames[value];
-		props.optionCbs[optionChosen](optionChosen);
+		props.onSelect(optionChosen);
 	}
 
 	const createOption = (s: string, k: number) =>
 	{
 		return (
-			<option 
+			<option
 				//
 				className={'optiontxt'}
 				key={k}
@@ -42,6 +42,7 @@ export function BoolView(props: Props)
 		<select className='optiontxt'
 			size={1} 
 			onChange={handleSelect}
+			value={selectedItem}
 		>
 			{ optionNames.map(createOption) }
 		</select>

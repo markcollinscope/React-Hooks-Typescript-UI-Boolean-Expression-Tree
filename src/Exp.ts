@@ -26,9 +26,9 @@ Delete:
 // for ease in change of formatting - add extra spaces ... etc.
 import { lg } from './utils';
 
-export const LB = '(';
-export const RB = ')';
-export const SEPERATOR = ',';
+export const LB = ' ( ';
+export const RB = ' ) ';
+export const SEPERATOR = ' , ';
 
 export class AppError extends Error
 {
@@ -48,7 +48,6 @@ export class NoEvalError extends AppError
 
 export class Exp  
 {
-	sub = (op: string): Exp | never => { throw new AppError(); }
 	name = (): string | never => { throw new AppError(); }
 	expand = (): string | never => { throw new AppError(); }
 	calc = (): boolean | never => { throw new AppError(); } // TODO check never;
@@ -84,51 +83,66 @@ export const trueExp = new ConstExp(true);
 export const falseExp = new ConstExp(false);
 
 // no export - Binary (AND,OR) and NOT Exp classes exported.
-class CompoundExp extends Exp 
+/*
+class CompoundExp extends Exp // Deprecate?
 {
 	private subexp: { [index: string] : Exp } = {};
 	
 	sub = (op: string) => this.subexp[op];
 	setsub 	= (op: string, v: Exp) => this.subexp[op] = v;
 }
+*/
 
-export const UNI = 'UNI'; // todo: rename. deprecate, use NOT
 export const NOT = 'NOT';
-export class NotExp extends CompoundExp
+export class NotExp extends Exp
 {
-	constructor(subExp: Exp = undefExp)
+	constructor(private subExp: Exp = undefExp)
 	{
 		super()
-		this.setsub(NOT, subExp)
+		this.setsubexp(subExp)
 	}
 
-	calc = (): boolean => ! this.sub(NOT).calc();
+	getsubexp = () => this.subExp
+	setsubexp = (e: Exp) => this.subExp = e;
+	
+	calc = (): boolean => ! this.getsubexp().calc();
 	name = (): string => NOT
-	expand = () => this.name() + LB + this.sub(NOT).expand() + RB;
+	expand = () => this.name() + LB + this.getsubexp().expand() + RB;
 }
 
-export const LHS = 'LHS'
-export const RHS = 'RHS'
-export const AND = 'AND';
-export const OR = 'OR';
-export class BinExp extends CompoundExp
+export const LHS = 	'LHS'
+export const RHS = 	'RHS'
+export const AND = 	'AND';
+export const OR = 	'OR';
+export class BinExp extends Exp
 {
-	static calcFn: { [index: string]: (lh: Exp, rh: Exp) => boolean} = // extensible approach - add 'NAND' - just follow the pattern!
+	private subexp: { [index: string] : Exp } = {};
+
+	// extensible approach - add 'NAND' - just follow the pattern!
+	static calcFn: { [index: string]: (lh: Exp, rh: Exp) => boolean } =
 	{
 		AND: (lh: Exp, rh: Exp) => lh.calc() && rh.calc(),
 		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc()
 	}
 
+	// lhs/rhs - left/right hand side (of subexpression), etc.
+	// op - a binary operator on booleans (and ...)
 	constructor(private op: string, lhs = undefExp, rhs = undefExp)
 	{
 		super();
-		this.setsub(LHS,lhs);
-		this.setsub(RHS, rhs);
+		this.setlhsexp(lhs);
+		this.setrhsexp(rhs);
 	}
 
+	setlhsexp = (e: Exp) => this.subexp[LHS] =  e;
+	setrhsexp = (e: Exp) => this.subexp[RHS] =  e;
+	getlhsexp = () => this.subexp[LHS];
+	getrhsexp = () => this.subexp[RHS];
+
 	name = () => this.op;
-	calc = () => BinExp.calcFn[this.op]( this.sub(LHS), this.sub(RHS) );
-	expand = () => this.name() + LB + this.sub(LHS).expand() + SEPERATOR + this.sub(RHS).expand() + RB;
+	calc = () => BinExp.calcFn[this.op]( this.getlhsexp(), this.getrhsexp() );
+	expand = () => this.name() + LB + this.getlhsexp().expand() + SEPERATOR + this.getrhsexp().expand() + RB;
 }
 
 // TODO: check out exception capture by type!
+// TODO: Rename AND -> AND_T ...

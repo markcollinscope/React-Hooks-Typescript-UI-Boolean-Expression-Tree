@@ -1,99 +1,107 @@
 import React from 'react';
 
 import { lg } from './utils'
+// basic case - UNDEF, TRUE or FALSE value.
 
-import { Exp, BinExp, NotExp, undefExp, trueExp, falseExp, UNI, LHS, RHS, AND } from './Exp';
-import { BoolView, OptionCbs } from './BoolView';
-
-export * from './Exp';	// TODO Redact.
-
-const tstFn = (s: string): void  => { lg("Menu: ", s) }
+import { Exp, BinExp, NotExp, undefExp, trueExp, falseExp, LHS, RHS, NOT, AND, OR, UNDEF, TRUE, FALSE } from './Exp';
+import { BoolView } from './BoolView';
 
 interface Props
 {
-	onUpdate: (result: boolean, expansion: string) => void;
 	exp: Exp;
+	parentUpdateFn:	(e: Exp) => Exp;
+	globalUpdateFn: () => void;
 };
 
 class State
 {
-	constructor(public rootExp: Exp, public canRender: boolean) {}	// check canRender - TODO
+	constructor(public thisExpRoot: Exp, public selected: string, public canRender: boolean) {}	// check canRender - TODO
 };
+
+export type OptionCbType = {[index: string]: () => Exp};
 
 const dropDownCbs =
 {
-	"undef":	(s: string) => { lg(s); return undefExp; },
-	"true": 	(s: string) => { lg(s); return trueExp; },
-	"false": 	(s: string) => { lg(s); return falseExp; },
-	"and":		(s: string) => { lg(s); return new BinExp(AND); }
-};
+	UNDEF:	() => { lg("Dropdown select: ",UNDEF); return undefExp; },
+	TRUE: 	() => { lg("Dropdown select: ", TRUE); return trueExp; },
+	FALSE: 	() => { lg("Dropdown select: ", FALSE); return falseExp; },
+	AND:	() => { lg("Dropdown select: ", AND); return new BinExp(AND); },
+	OR:		() => { lg("Dropdown select: ", OR); return new BinExp(OR); },
+	NOT:	() => { lg("Dropdown select: ", NOT); return new NotExp(); }
+} as OptionCbType;
 
-/* HERE! HERE! TODO
-	rootExp - parent of current expression to be shown - for App - this is 'dummy parent',
-	to enable the App root Exp to be modified.
-    
-    (App)     (type and dropdown)
-    dummyExp ---> xxxExp --------------------> xxxExp ... etc.
-                    |------------------------> exxExp ... etc.     
-	
-	selecting a new option (from the dropdown menu on all Exp nodes) changes
-	
-*/
-
+// Recursively instantiated React class. Exp sub-expressions use ExpView within ExpView, etc.
 export class ExpView extends React.Component<Props, State>
 {
 	constructor(props: Props)
 	{
 		super(props);
-		this.state = new State(props.exp, true);
+		this.state = new State(props.exp, props.exp.name(), true);
+	}
+
+	handleDropDownUpdate = (value: string) =>
+	{
+		const newRoot = this.props.parentUpdateFn( dropDownCbs[value]() );
+
+		lg("Dropdown Select Exp Now: ", newRoot.expand())
+
+		const newState = new State(newRoot, value, true);
+		this.setState(newState);
+		this.props.globalUpdateFn();
 	}
 
 	render()
 	{
 		if (!this.state.canRender) return <p>Loading...</p>
 
-		const isUniExp = this.props.exp instanceof NotExp;
-		const isBinExp = this.props.exp instanceof BinExp;
-		
+		// basic case - UNDEF, TRUE or FALSE value.
 		let expReturn = 
 			<div className='bdr stdfont expwidth'>
 			<BoolView 
-				optionCbs={ dropDownCbs }
+				options={ Object.keys(dropDownCbs) }
+				onSelect={ this.handleDropDownUpdate }
+				selected={ this.props.exp.name() }
 			/>
 			</div>
-		
-		// let expReturn = <p className='bdr stdfont expwidth'>{rootExpTypeName}</p> TODO.
 
-		if (isUniExp)
+
+		if (this.props.exp instanceof NotExp)
 		{
+			const notExp = this.props.exp as NotExp // downcast to subclass.
+		
 			expReturn = 
 				<div className='flex-horiz'>
 					{expReturn}
 					<div className='vgap'/>
 					<ExpView
-						exp={this.props.exp.sub(UNI)}
-						onUpdate={this.props.onUpdate}
+						exp={notExp.getsubexp()}
+						parentUpdateFn={notExp.setsubexp}
+						globalUpdateFn={this.props.globalUpdateFn}						
 					/>
 				</div>
 		}
 	
-		if (isBinExp)
+		if (this.props.exp instanceof BinExp)
 		{
+			const binExp = this.props.exp as BinExp;
+
 			expReturn = 
 				<div>
 					{expReturn}
 					<div className='vgap'/>
 					<div className='lhsmargin'>
 						<ExpView
-							exp={this.props.exp.sub(LHS)}
-							onUpdate={this.props.onUpdate}
+							exp={binExp.getlhsexp()}
+							parentUpdateFn={binExp.setlhsexp}
+							globalUpdateFn={this.props.globalUpdateFn}
 						/>
 					</div>
 					<div className='vgap'/>
 					<div className='lhsmargin'>
 						<ExpView 
-							exp={this.props.exp.sub(RHS)}
-							onUpdate={this.props.onUpdate}
+							exp={binExp.getrhsexp()}
+							parentUpdateFn={binExp.setrhsexp}
+							globalUpdateFn={this.props.globalUpdateFn}
 						/>
 					</div>
 				</div>
@@ -103,14 +111,14 @@ export class ExpView extends React.Component<Props, State>
 	}
 }
 
-// if (rootExp instanceof BinExp) //TODO
+// if (thisExpRoot instanceof BinExp) //TODO
 		// {
-		// 	isBinExp = true;
+		// 	isBinOptExp = true;
 		// 	lg('bin exp')
 		// }
-		// else if (rootExp instanceof NotExp) //TODO
+		// else if (thisExpRoot instanceof NotExp) //TODO
 		// {
-		// 	isUniExp = true;
+		// 	isUniOpExp = true;
 		// 	lg('uni exp')
 		// }
 		// else
@@ -118,16 +126,16 @@ export class ExpView extends React.Component<Props, State>
 		// 	lg('const')
 		// }
 
-		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(rootExpTypeName) )
+		// if ( [undefExp.name(), trueExp.name(), falseExp.name()].includes(thisExpRootTypeName) )
 		// {
-		// 	expTxt = rootExpTypeName
+		// 	expTxt = thisExpRootTypeName
 
 		// 	lg('const')
 		// }
-		// else if (rootExpTypeName === new NotExp().name()) //TODO
+		// else if (thisExpRootTypeName === new NotExp().name()) //TODO
 		// {
-		// 	expTxt = rootExpTypeName
-		// 	isUniExp = true;
+		// 	expTxt = thisExpRootTypeName
+		// 	isUniOpExp = true;
 
 		// 	lg('uni exp')
 		// }

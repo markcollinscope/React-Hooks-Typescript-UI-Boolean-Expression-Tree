@@ -1,12 +1,11 @@
+import { lg, assert } from './utils';
 
 import {
 	AND, OR, Exp, BinExp, falseExp, trueExp, NOT, UNDEF, AppError, NoEvalError, undefExp, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
-const assert = (v: boolean)  => { if (!v) throw 'error'; }
-
 // Tests (part 1)
-describe(`test basic type creation`, function()
+describe(`test Exp and subclasses - creation, evaluation and expansion to string`, function()
 {
 	it('** create exp throws app errors', function()
 	{

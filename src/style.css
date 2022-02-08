@@ -6,14 +6,14 @@ p {
 	margin: 0;
 }
 
-.App {
+.app {
 	text-align: center;
 	background: black;
 	color: yellow;
 	padding-left: 1vw;
 }
 
-.App-header {
+.app-header {
 	align-items: center;
 	justify-content: center;
 	color: red;

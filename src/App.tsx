@@ -2,68 +2,124 @@ import { lg } from './utils';
 
 // UI (Interface)
 import React from 'react';
-import { NoEvalError, ExpView, NotExp, BinExp, AND, OR, trueExp, falseExp } from './ExpView'
+import { ExpView } from './ExpView'
 
 // Domain
-import { undefExp } from './Exp'
+import { undefExp, Exp, NotExp, BinExp, AND, OR, trueExp, falseExp, NoEvalError  } from './Exp'
 
 // visuals
 import './style.css';
 
-function App() 
+/* 	dummyRootExp is the parent of the actual Exp to be shown.
+    
+    (App)         (has dropdown)
+    dummyRoot ---> visibleRoot-------------------------> xxxExp ... etc.
+                       |-------------------------------> xxxExp ... etc.     
+	
+	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' if reference form
+	for this to happen. Selecting a new option (from the dropdown menu of visible) changes the visibleRoot
+	by updating the contents of dummyRoot.
+*/
+
+class DummyRoot extends NotExp {} // purely for clarity... s
+
+class State
 {
-	let initExp = 
-		new BinExp(
-			OR,
-			new BinExp(
-				AND,
-				new NotExp( 
-					new NotExp( 
-						new NotExp(trueExp) 
-					) 
-				),
-				new NotExp(falseExp)
-			),
-			falseExp
-		);
+	constructor(public dummyRoot: Exp, public result: string, public textExp: string) {};
+}
 
-	let textExp = undefExp.name();
-	let result = undefExp.name();
+class App extends React.Component<{}, State> 
+{
+	visibleRoot = () => this.state.dummyRoot.getsubexp();
 
-	try {
-		result  = initExp.calc() ? 'TRUE' : 'FALSE'
-	}
-	catch (e)
+	calcState = (dummyRoot: DummyRoot): State =>
 	{
-		lg('catch undef')
-		if (e instanceof NoEvalError) result = undefExp.name();
+		const textExp = this.visibleRoot().expand();
+		
+		let result = ''; 
+
+		try {
+			result = this.visibleRoot().calc() ? 'TRUE' : 'FALSE';
+		}
+		catch (e)
+		{
+			lg('[Attempted to calculate an undefined value]');
+
+			if (e instanceof NoEvalError) 
+				result = undefExp.name();	
+			else
+				throw(e);	// some other error...
+		}
+
+		return new State(dummyRoot, result, textExp);
 	}
 
-	textExp = initExp.expand();
+	constructor(props = {})
+	{
+		super(props);
 
-	return (
-		<div className="App">
-			<header className="App-header tac botmargin">
-				De-luxe Boolean Expression Calculator
-				<p className='smfont'>for all your boolean evaluation needs</p>
-				<p className='smfont'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
-			</header>
+		const startExp = undefExp;
+		/* 	
+		for debug or personal amusement, try:
+			new NotExp( 
+				new BinExp( 
+					OR, 
+					new BinExp( 
+						AND, 
+						new NotExp( new NotExp( new NotExp(trueExp) ) ), 
+						new NotExp(falseExp) 	
+					), 
+					falseExp 
+				) 
+			); 
+		*/
 
-			<div className='tal lgfont flex-horiz'>
-				<p className='expwidth'>EXPRESSION:</p> 
-				<p className='expwidth'>{textExp}</p>
+		const dummyRoot = new NotExp(startExp);
+		this.state = this.calcState(dummyRoot);
+	}
+
+	updateState = () => 
+	{
+		this.setState( this.calcState(this.state.dummyRoot) );
+		
+		lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
+	}
+
+	updateDummyRoot = (e: Exp) =>
+	{
+		(this.state.dummyRoot as NotExp).setsubexp(e);		
+		this.setState(this.calcState(this.state.dummyRoot));
+
+		return e;
+	}
+
+	render()
+	{
+		return (
+			<div className="app">
+				<header className="app-header tac botmargin">
+					De-luxe Boolean Expression Calculator
+					<p className='smfont'>for all your boolean evaluation needs</p>
+					<p className='smfont'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
+				</header>
+
+				<div className='tal lgfont flex-horiz'>
+					<p className='expwidth'>EXPRESSION:</p> 
+					<p className=''>{this.state.textExp}</p>
+				</div>
+				<div className='tal lgfont flex-horiz botmargin'>
+					<p className='expwidth'>RESULT:</p> 
+					<p className='expwidth'>{this.state.result}</p>
+				</div>
+
+				<ExpView
+					exp={this.visibleRoot()}
+					parentUpdateFn={this.updateDummyRoot}
+					globalUpdateFn={this.updateState}
+				/>
 			</div>
-			<div className='tal lgfont flex-horiz botmargin'>
-				<p className='expwidth'>RESULT:</p> 
-				<p className='expwidth'>{result}</p>
-			</div>
-
-			<ExpView
-				exp={initExp}
-				onUpdate={ (result: boolean, expansion: string) => {} }
-			/>
-		</div>
-	);
+		);
+	}
 }
 
 export default App;
