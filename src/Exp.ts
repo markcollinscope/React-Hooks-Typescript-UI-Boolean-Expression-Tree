@@ -1,7 +1,9 @@
-// Abstraction of the concept of a valid boolean expression.
-// Deals with creation and calcution of such expressions, including constants values, binary operations, unary operations (well NOT)
-// Does not deal with UI - it is part of the business logic of the application.
-// It is used by the UI code to create, modify and calcuate the expressions contained herein.
+// Abstraction of the concept of a boolean expression.
+// Deals with creation and calcution of such expressions, including constants values, 
+// binary operations, unary operations (well NOT), and undefined values.
+
+// The code here does Not deal with UI - this code is 'functional' (business) logic only.
+// It is used by the UI code to create, modify and evaluate the expressions contained herein.
 
 import { AppError } from './AppError';
 import { progError } from './utils';
@@ -65,7 +67,7 @@ export class NotExp extends Exp
 	setSubExp = (e: Exp) => this.subExp = e;
 	
 	calc = (): boolean => ! this.getSubExp().calc();
-	name = (): string => 'Not'
+	name = () => 'Not';
 	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
 }
 export const NOT = (new NotExp()).name();
@@ -74,7 +76,8 @@ export const NOT = (new NotExp()).name();
 const LHS = '_LHS'
 const RHS = '_RHS'
 
-// for formatting of expressions when converting to string. Exported for tests (only)
+// for formatting of expressions when converting to string version of the expression.
+// exported for tests (only).
 export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';

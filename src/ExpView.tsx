@@ -1,10 +1,17 @@
+// visual representation of boolean expressions - done in such a way as to enable 
+// the dynamic construction of complex nested expressions (and, or, not ...), 
+// including allowing undefined elements and the use of boolean constants.
+// provides the UI side of Exp's - see expression logic below.
+
 import React from 'react';
+import { ConstExpView } from './ConstExpView';
 
 import { lg } from './utils'
 // basic case - UNDEF, TRUE or FALSE value.
 
+// expression logic and constants.
 import { Exp, BinExp, NotExp, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT, AND, OR, UNDEF, TRUE, FALSE } from './Exp';
-import { ConstExpView } from './ConstExpView';
+
 
 interface Props
 {
