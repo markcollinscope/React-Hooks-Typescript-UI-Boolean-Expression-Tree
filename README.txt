@@ -19,9 +19,9 @@ ExpView.tsx (interface)             Exp.test.ts (test)
    V  V                                     | 
  Exp.ts (domain)<----------------------------
    |
-   |
-   V
-gitAppEror.ts & utils.ts (infrastructure) (nb: most modules use these, as is normal)
+   |-----------|
+   V           V
+AppEror.ts  utils.ts (infrastructure) (nb: most modules use these, as is normal)
 
 * no cycles, etc in dependencies.
 * seperation of business logic and UI code and infrastructure
