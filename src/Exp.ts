@@ -74,8 +74,8 @@ export class NotExp extends Exp
 export const NOT_OP = (new NotExp()).name();
 
 //******
-const LHS = '_LHS_'
-const RHS = '_RHS_'
+const LHS = '_Left_'
+const RHS = '_Right_'
 
 // for formatting of expressions when converting to string version of the expression.
 // exported for tests (only).
