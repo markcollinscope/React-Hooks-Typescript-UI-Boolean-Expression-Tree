@@ -5,7 +5,7 @@ import React from 'react';
 import { ExpView } from './ExpView'
 
 // Domain
-import { undefExp, Exp, NotExp, BinExp, AND, OR, trueExp, falseExp, NoEvalError  } from './Exp'
+import { UNDEF_EXP, Exp, NotExp, UndefExpError  } from './Exp'
 
 // visuals
 import './style.css';
@@ -17,36 +17,33 @@ import './style.css';
                        |-------------------------------> xxxExp ... etc.     
 	
 	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' if reference form
-	for this to happen. Selecting a new option (from the dropdown menu of visible) changes the visibleRoot
-	by updating the contents of dummyRoot.
+	for this to happen. Selecting a new option (from the dropdown menu of visibleRoot) changes the visibleRoot
+	by updating the reference held indummyRoot.
 */
 
-class DummyRoot extends NotExp {} // purely for clarity... s
+class DummyRoot extends NotExp {} // purely for clarity of intent... no functional difference - used as a container for visibleRoot.
 
 class State
 {
-	constructor(public dummyRoot: Exp, public result: string, public textExp: string) {};
+	constructor(public dummyRoot: DummyRoot, public result: string, public textExp: string) {};
 }
 
 class App extends React.Component<{}, State> 
 {
-	visibleRoot = () => this.state.dummyRoot.getsubexp();
-
-	calcState = (dummyRoot: DummyRoot): State =>
+	createState = (dummyRoot: DummyRoot): State =>
 	{
-		const textExp = this.visibleRoot().expand();
-		
+		const textExp = dummyRoot.getSubExp().expand();
 		let result = ''; 
 
 		try {
-			result = this.visibleRoot().calc() ? 'TRUE' : 'FALSE';
+			result = dummyRoot.getSubExp().calc() ? 'TRUE' : 'FALSE';
 		}
 		catch (e)
 		{
 			lg('[Attempted to calculate an undefined value]');
 
-			if (e instanceof NoEvalError) 
-				result = undefExp.name();	
+			if (e instanceof UndefExpError) 
+				result = UNDEF_EXP.name();	
 			else
 				throw(e);	// some other error...
 		}
@@ -54,41 +51,42 @@ class App extends React.Component<{}, State>
 		return new State(dummyRoot, result, textExp);
 	}
 
+	visibleRoot = () => this.state.dummyRoot.getSubExp();
+
 	constructor(props = {})
 	{
 		super(props);
 
-		const startExp = undefExp;
+		const startExp = UNDEF_EXP;
 		/* 	
-		for debug or personal amusement, try:
+		for debug or personal amusement(!), try:
 			new NotExp( 
 				new BinExp( 
 					OR, 
 					new BinExp( 
 						AND, 
-						new NotExp( new NotExp( new NotExp(trueExp) ) ), 
-						new NotExp(falseExp) 	
+						new NotExp( new NotExp( new NotExp(TRUE_EXP) ) ), 
+						new NotExp(FALSE_EXP) 	
 					), 
-					falseExp 
+					FALSE_EXP 
 				) 
 			); 
 		*/
 
-		const dummyRoot = new NotExp(startExp);
-		this.state = this.calcState(dummyRoot);
+		const dummyRoot = new DummyRoot(startExp);
+		this.state = this.createState(dummyRoot);
 	}
 
 	updateState = () => 
 	{
-		this.setState( this.calcState(this.state.dummyRoot) );
-		
+		this.setState( this.createState(this.state.dummyRoot) );
 		lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
 	}
 
 	updateDummyRoot = (e: Exp) =>
 	{
-		(this.state.dummyRoot as NotExp).setsubexp(e);		
-		this.setState(this.calcState(this.state.dummyRoot));
+		(this.state.dummyRoot as NotExp).setSubExp(e);		
+		this.setState(this.createState(this.state.dummyRoot));
 
 		return e;
 	}
@@ -97,19 +95,19 @@ class App extends React.Component<{}, State>
 	{
 		return (
 			<div className="app">
-				<header className="app-header tac botmargin">
+				<header className="app-header tac bot-margin">
 					De-luxe Boolean Expression Calculator
-					<p className='smfont'>for all your boolean evaluation needs</p>
-					<p className='smfont'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
+					<p className='sm-font'>for all your boolean evaluation needs</p>
+					<p className='sm-font'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
 				</header>
 
-				<div className='tal lgfont flex-horiz'>
-					<p className='expwidth'>EXPRESSION:</p> 
+				<div className='tal lg-font flex-horiz'>
+					<p className='exp-width'>EXPRESSION:</p> 
 					<p className=''>{this.state.textExp}</p>
 				</div>
-				<div className='tal lgfont flex-horiz botmargin'>
-					<p className='expwidth'>RESULT:</p> 
-					<p className='expwidth'>{this.state.result}</p>
+				<div className='tal lg-font flex-horiz bot-margin'>
+					<p className='exp-width'>RESULT:</p> 
+					<p className='exp-width'>{this.state.result}</p>
 				</div>
 
 				<ExpView

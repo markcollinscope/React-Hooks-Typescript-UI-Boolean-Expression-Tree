@@ -19,7 +19,7 @@ p {
 	color: red;
 }
 
-.botmargin {
+.bot-margin {
 	margin-bottom: 3vh;
 }
 
@@ -36,23 +36,23 @@ p {
 	margin: 1px;
 }
 
-.smfont {
+.sm-font {
 	font-size: .8vw;
 }
 
-.stdfont {
+.md-font {
 	font-size: 1vw
 }
 
-.lgfont {
+.lg-font {
 	font-size: 1.4vw	
 }
 
-.expwidth {
+.exp-width {
 	width: 10vw;
 }
 
-.lhsmargin {
+.lhs-margin {
 	margin-left: 10vw;
 }
 
@@ -62,7 +62,7 @@ p {
 	justify-content: left;
 }
 
-.optiontxt {
+.option-txt {
 	background: black;
 	color: yellow;	
 }

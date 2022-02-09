@@ -1,7 +1,9 @@
-import { lg, assert } from './utils';
+import { assert } from './utils';
+
+import { AppError } from './AppError'
 
 import {
-	AND, OR, Exp, BinExp, falseExp, trueExp, NOT, UNDEF, AppError, NoEvalError, undefExp, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
+	AND, OR, Exp, BinExp, FALSE_EXP, TRUE_EXP, NOT, UndefExpError, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
 // Tests (part 1)
@@ -15,24 +17,24 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** undefined expression throw no-eval error on calc', function()
 	{
-		expect( () => undefExp.calc() ).toThrow(NoEvalError);
+		expect( () => UNDEF_EXP.calc() ).toThrow(UndefExpError);
 	});
 
 	it('** true/false constants to evaluate correctly', function()
 	{
-		assert( trueExp.calc() );
-		assert( ! falseExp.calc() );
+		assert( TRUE_EXP.calc() );
+		assert( ! FALSE_EXP.calc() );
 	});
 
 	it('** Not (Uni) expression evaluates correctly', function()
 	{
-		assert( new NotExp(falseExp).calc() );
-		assert( ! new NotExp(trueExp).calc() );
+		assert( new NotExp(FALSE_EXP).calc() );
+		assert( ! new NotExp(TRUE_EXP).calc() );
 	});
 
 	it('** Not expression expands (to string representation) correctly', function()
 	{
-		const f = falseExp;
+		const f = FALSE_EXP;
 		const fname = f.name();
 
 		const not = new NotExp(f);
@@ -44,26 +46,26 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 	it('** AND expressions evaluation correctly', function()
 	{
 
-		assert( new BinExp( AND, trueExp, trueExp ).calc() );
-		assert( ! new BinExp( AND, trueExp, falseExp ).calc() );
-		assert( ! new BinExp( AND, falseExp, trueExp ).calc() );
-		assert( ! new BinExp( AND, falseExp, falseExp ).calc() );
+		assert( new BinExp( AND, TRUE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( AND, TRUE_EXP, FALSE_EXP ).calc() );
+		assert( ! new BinExp( AND, FALSE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( AND, FALSE_EXP, FALSE_EXP ).calc() );
 	});
 
 	it('** OR expressions evaluation correctly', function()
 	{
-		assert( new BinExp( OR, trueExp, trueExp ).calc() );
-		assert( new BinExp( OR, trueExp, falseExp ).calc() );
-		assert( new BinExp( OR, falseExp, trueExp ).calc() );
-		assert( ! new BinExp( OR, falseExp, falseExp ).calc() );
+		assert( new BinExp( OR, TRUE_EXP, TRUE_EXP ).calc() );
+		assert( new BinExp( OR, TRUE_EXP, FALSE_EXP ).calc() );
+		assert( new BinExp( OR, FALSE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( OR, FALSE_EXP, FALSE_EXP ).calc() );
 	});
 
 	it('** AND / OR expressions expand to strings correctly', function()
 	{
-		const t = trueExp.name();
+		const t = TRUE_EXP.name();
 
-		assert( new BinExp( AND, trueExp, trueExp ).expand() === AND + LB + t + SEPERATOR + t + RB);
-		assert( new BinExp( OR, trueExp, trueExp ).expand() === OR + LB + t + SEPERATOR + t + RB);
+		assert( new BinExp( AND, TRUE_EXP, TRUE_EXP ).expand() === AND + LB + t + SEPERATOR + t + RB);
+		assert( new BinExp( OR, TRUE_EXP, TRUE_EXP ).expand() === OR + LB + t + SEPERATOR + t + RB);
 	});
 
 	it('** Deeper nested expression with UNDEF throws exception', function() 
@@ -73,13 +75,13 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 				AND,
 				new BinExp( 
 					OR,
-					trueExp,
-					falseExp
+					TRUE_EXP,
+					FALSE_EXP
 				)
 				// default second arg to UndefExp ...UndefExp
 			);
 
-		expect( () => e.calc() ).toThrow(NoEvalError);
+		expect( () => e.calc() ).toThrow(UndefExpError);
 	});
 	
 	it('** Deeper nested expression expands to string correctly', function() 
@@ -89,10 +91,10 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 				AND,
 				new BinExp( // OR ( T, F)
 					OR, 
-					trueExp,
-					falseExp
+					TRUE_EXP,
+					FALSE_EXP
 				),
-				new NotExp( falseExp ) // NOT ( F )
+				new NotExp( FALSE_EXP ) // NOT ( F )
 			);
 		
 		// AND(OR(TRUE,FALSE),NOT(FALSE))
@@ -106,10 +108,10 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 				AND,
 				new BinExp( // TRUE.
 					OR, 
-					trueExp,
-					falseExp
+					TRUE_EXP,
+					FALSE_EXP
 				),
-				new NotExp( falseExp ) // TRUE
+				new NotExp( FALSE_EXP ) // TRUE
 			);
 		assert( e.calc() );
 	}); 

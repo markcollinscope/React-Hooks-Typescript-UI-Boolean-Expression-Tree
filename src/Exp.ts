@@ -1,73 +1,40 @@
-/*
-UI Actions:
-* Eval Button - enabled when Eval possible.
-* Txt representation of expression shown.
-* Start: undef-nodetype -> UI Select From Drop Down Menu -> Create Appropriate Subnode. Factory.
-* AND, OR, BINOP => two undef subnodes.
-* NOT => one undef subnode.
-* Eval => recursive descent calcuation.
-* Undef in Eval (anywhere) - whole expression is Undef.
-
-Menu:
-* On Undef nodes only.
-* Callback deletes then recreates lhs, rhs ...
-
-Delete:
-* On Composite Nodes (UI) only.
-* Replaces subnode with Undef.
-* ... then: just normal.
-*/
-
 // Abstraction of the concept of a valid boolean expression.
-// Deals with creation and calcution of such expressions, including constants values, binary operations, unary operations.
-// This module does not deal with UI as it is part of the business logic of the application.
-// It is, of course, used by the UI code to create, modify and calcuate the expressions contained herein.
+// Deals with creation and calcution of such expressions, including constants values, binary operations, unary operations (well NOT)
+// Does not deal with UI - it is part of the business logic of the application.
+// It is used by the UI code to create, modify and calcuate the expressions contained herein.
 
-// for ease in change of formatting - add extra spaces ... etc.
-import { lg } from './utils';
+import { AppError } from './AppError'
 
-export const LB = ' ( ';
-export const RB = ' ) ';
-export const SEPERATOR = ' , ';
-
-export class AppError extends Error
+//******
+// this belongs here as it is integrally bound into how this module works.
+export class UndefExpError extends AppError
 {
-	constructor(message: string = "basic application programming error") 
-	{
-		super(message);
-	}
+	constructor(message: string = "cannot calcuate expression") { super(message); }
 }
 
-export class NoEvalError extends AppError
-{
-	constructor(message: string = "cannot calcuate expression")
-	{
-		super(message);
-	}
-}
-
-export class Exp  
+//******
+export class Exp  // abstract base class.
 {
 	name = (): string | never => { throw new AppError(); }
 	expand = (): string | never => { throw new AppError(); }
 	calc = (): boolean | never => { throw new AppError(); } // TODO check never;
 }
 
-export const UNDEF = 'UNDEF';
+//******
 class UndefExp extends Exp // no export - immutable Undef Exp value created and exported.
 {
-	name = () => UNDEF;
+	name = () => 'UNDEF';
 	expand = () => this.name();
 	calc = (): boolean | never => 
 	{ 
 		// throwing exception saves hassle dealing with UNDEF left, right and centre during bool op evaluation.
-		throw new NoEvalError(); 
+		throw new UndefExpError(); 
 	} 
 }
-export const undefExp = new UndefExp(); // todo: rename
+export const UNDEF_EXP = new UndefExp();
+export const UNDEF = UNDEF_EXP.name();
 
-export const TRUE = 'TRUE';
-export const FALSE = 'FALSE';
+//******
 class ConstExp extends Exp // no export - T, F immutable Exp values created and exported.
 {
 	constructor(private value: boolean)
@@ -76,42 +43,42 @@ class ConstExp extends Exp // no export - T, F immutable Exp values created and 
 	}
 
 	calc = () => this.value;
-	name = () => this.value ? TRUE : FALSE;
+	name = () => this.value ? 'TRUE' : 'FALSE';
 	expand = () => this.name();
 }
-export const trueExp = new ConstExp(true);
-export const falseExp = new ConstExp(false);
+export const TRUE_EXP = new ConstExp(true);
+export const FALSE_EXP = new ConstExp(false);
+export const TRUE = TRUE_EXP.name();
+export const FALSE = FALSE_EXP.name();
 
-// no export - Binary (AND,OR) and NOT Exp classes exported.
-/*
-class CompoundExp extends Exp // Deprecate?
-{
-	private subexp: { [index: string] : Exp } = {};
-	
-	sub = (op: string) => this.subexp[op];
-	setsub 	= (op: string, v: Exp) => this.subexp[op] = v;
-}
-*/
-
-export const NOT = 'NOT';
+//******
 export class NotExp extends Exp
 {
-	constructor(private subExp: Exp = undefExp)
+	constructor(private subExp: Exp = UNDEF_EXP)
 	{
 		super()
-		this.setsubexp(subExp)
+		this.setSubExp(subExp)
 	}
 
-	getsubexp = () => this.subExp
-	setsubexp = (e: Exp) => this.subExp = e;
+	getSubExp = () => this.subExp
+	setSubExp = (e: Exp) => this.subExp = e;
 	
-	calc = (): boolean => ! this.getsubexp().calc();
-	name = (): string => NOT
-	expand = () => this.name() + LB + this.getsubexp().expand() + RB;
+	calc = (): boolean => ! this.getSubExp().calc();
+	name = (): string => 'NOT'
+	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
 }
+export const NOT = (new NotExp()).name();
 
-export const LHS = 	'LHS'
-export const RHS = 	'RHS'
+//******
+const LHS = '_LHS'
+const RHS = '_RHS'
+
+// for formatting of expressions when converting to string. Exported for tests (only)
+export const LB = ' ( ';
+export const RB = ' ) ';
+export const SEPERATOR = ' , ';
+
+// create BinExp with AND or OR op.
 export const AND = 	'AND';
 export const OR = 	'OR';
 export class BinExp extends Exp
@@ -126,23 +93,20 @@ export class BinExp extends Exp
 	}
 
 	// lhs/rhs - left/right hand side (of subexpression), etc.
-	// op - a binary operator on booleans (and ...)
-	constructor(private op: string, lhs = undefExp, rhs = undefExp)
+	// op - a binary operator on booleans (and, or, xor, nor ...)
+	constructor(private op: string, lhs = UNDEF_EXP, rhs = UNDEF_EXP)
 	{
 		super();
-		this.setlhsexp(lhs);
-		this.setrhsexp(rhs);
+		this.setLhsExp(lhs);
+		this.setRhsExp(rhs);
 	}
 
-	setlhsexp = (e: Exp) => this.subexp[LHS] =  e;
-	setrhsexp = (e: Exp) => this.subexp[RHS] =  e;
-	getlhsexp = () => this.subexp[LHS];
-	getrhsexp = () => this.subexp[RHS];
+	setLhsExp = (e: Exp) => this.subexp[LHS] =  e;
+	setRhsExp = (e: Exp) => this.subexp[RHS] =  e;
+	getLhsExp = () => this.subexp[LHS];
+	getRhsExp = () => this.subexp[RHS];
 
 	name = () => this.op;
-	calc = () => BinExp.calcFn[this.op]( this.getlhsexp(), this.getrhsexp() );
-	expand = () => this.name() + LB + this.getlhsexp().expand() + SEPERATOR + this.getrhsexp().expand() + RB;
+	calc = () => BinExp.calcFn[this.op]( this.getLhsExp(), this.getRhsExp() );
+	expand = () => this.name() + LB + this.getLhsExp().expand() + SEPERATOR + this.getRhsExp().expand() + RB;
 }
-
-// TODO: check out exception capture by type!
-// TODO: Rename AND -> AND_T ...

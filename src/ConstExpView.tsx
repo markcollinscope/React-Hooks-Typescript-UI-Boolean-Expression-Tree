@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import { Exp } from './Exp';
-
 interface Props
 {	
 	onSelect:	(v: string) => void;
@@ -9,7 +7,7 @@ interface Props
 	selected:	string;
 }
 
-export function BoolView(props: Props)
+export function ConstExpView(props: Props)
 {
 	const optionNames = props.options;
 	const selectedItem = optionNames.indexOf(props.selected);
@@ -29,7 +27,7 @@ export function BoolView(props: Props)
 		return (
 			<option
 				//
-				className={'optiontxt'}
+				className={'option-txt'}
 				key={k}
 				value={k}
 			> 
@@ -39,7 +37,7 @@ export function BoolView(props: Props)
 	}
 
 	return (
-		<select className='optiontxt'
+		<select className='option-txt'
 			size={1} 
 			onChange={handleSelect}
 			value={selectedItem}
