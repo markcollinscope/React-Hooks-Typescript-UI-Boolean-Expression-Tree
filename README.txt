@@ -1,5 +1,6 @@
 
 # RUNNING THE APP
+* use branch MASTER (lower case)!
 * npm start - to start the development server - listen on localhost:3000 (should auto-start browser).
 * npm test - to run the domain level unit tests (Exp.test.ts). Uses 'jest' (sort of...)
 
