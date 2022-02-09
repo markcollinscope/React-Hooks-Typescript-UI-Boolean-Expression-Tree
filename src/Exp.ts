@@ -73,8 +73,8 @@ export class NotExp extends Exp
 export const NOT = (new NotExp()).name();
 
 //******
-const LHS = '_LHS'
-const RHS = '_RHS'
+const LHS = '_LHS_'
+const RHS = '_RHS_'
 
 // for formatting of expressions when converting to string version of the expression.
 // exported for tests (only).
@@ -83,14 +83,14 @@ export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
 // create BinExp with AND or OR op.
-export const AND = 	'And';
-export const OR = 	'Or';
+export const AND = 	'AND';
+export const OR = 	'OR';
 export class BinExp extends Exp
 {
 	private subexp: { [index: string] : Exp } = {};
 
 	// extensible approach - add 'NAND' - just follow the pattern!
-	static calcFn: { [index: string]: (lh: Exp, rh: Exp) => boolean } =
+	private static calcFn: { [index: string]: ( (lh: Exp, rh: Exp) => boolean ) } =
 	{
 		AND: (lh: Exp, rh: Exp) => lh.calc() && rh.calc(),
 		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc()
