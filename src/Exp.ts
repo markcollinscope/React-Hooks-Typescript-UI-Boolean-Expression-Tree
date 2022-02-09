@@ -3,7 +3,8 @@
 // Does not deal with UI - it is part of the business logic of the application.
 // It is used by the UI code to create, modify and calcuate the expressions contained herein.
 
-import { AppError } from './AppError'
+import { AppError } from './AppError';
+import { progError } from './utils';
 
 //******
 // this belongs here as it is integrally bound into how this module works.
@@ -15,15 +16,15 @@ export class UndefExpError extends AppError
 //******
 export class Exp  // abstract base class.
 {
-	name = (): string | never => { throw new AppError(); }
-	expand = (): string | never => { throw new AppError(); }
-	calc = (): boolean | never => { throw new AppError(); } // TODO check never;
+	name = (): string | never => progError();
+	expand = (): string | never => progError();
+	calc = (): boolean | never => progError();
 }
 
 //******
 class UndefExp extends Exp // no export - immutable Undef Exp value created and exported.
 {
-	name = () => 'UNDEF';
+	name = () => 'Undefined';
 	expand = () => this.name();
 	calc = (): boolean | never => 
 	{ 
@@ -43,7 +44,7 @@ class ConstExp extends Exp // no export - T, F immutable Exp values created and 
 	}
 
 	calc = () => this.value;
-	name = () => this.value ? 'TRUE' : 'FALSE';
+	name = () => this.value ? 'True' : 'False';
 	expand = () => this.name();
 }
 export const TRUE_EXP = new ConstExp(true);
@@ -64,7 +65,7 @@ export class NotExp extends Exp
 	setSubExp = (e: Exp) => this.subExp = e;
 	
 	calc = (): boolean => ! this.getSubExp().calc();
-	name = (): string => 'NOT'
+	name = (): string => 'Not'
 	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
 }
 export const NOT = (new NotExp()).name();
@@ -79,8 +80,8 @@ export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
 // create BinExp with AND or OR op.
-export const AND = 	'AND';
-export const OR = 	'OR';
+export const AND = 	'And';
+export const OR = 	'Or';
 export class BinExp extends Exp
 {
 	private subexp: { [index: string] : Exp } = {};
