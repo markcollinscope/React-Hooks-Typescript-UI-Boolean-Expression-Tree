@@ -1,6 +1,6 @@
 ## React Based Boolean Expression Construction and Evaluation
 
-![boolean expressions in react...](Images/exp.png)
+![boolean expressions in react...](images/exp.png)
 
 ### RUNNING THE APP
 * use branch MAIN (lower case)!
