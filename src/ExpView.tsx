@@ -69,14 +69,16 @@ export class ExpView extends React.Component<Props, State>
 			const notExp = this.props.exp as NotExp // downcast to subclass.
 		
 			viewExpToReturn = 
-				<div className='flex-horiz'>
+				<div>
 					{viewExpToReturn}
 					<div className='vgap'/>
-					<ExpView
-						exp={notExp.getSubExp()}
-						parentUpdateFn={notExp.setSubExp}
-						globalUpdateFn={this.props.globalUpdateFn}						
-					/>
+					<div className='lhs-margin'>
+						<ExpView
+							exp={notExp.getSubExp()}
+							parentUpdateFn={notExp.setSubExp}
+							globalUpdateFn={this.props.globalUpdateFn}						
+						/>
+					</div>
 				</div>
 		}
 	

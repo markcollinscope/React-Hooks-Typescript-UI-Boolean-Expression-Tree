@@ -7,7 +7,7 @@ import { ExpView } from './ExpView'
 // Domain
 import { UNDEF_EXP, Exp, NotExp, UndefExpError  } from './Exp'
 
-/* 	dummyRootExp is the parent of the actual Exp to be shown.
+/* 	dummyRoot(Exp) is the parent of the actual Exp to be shown.
     
     (App)         (has dropdown)
     dummyRoot ---> visibleRoot-------------------------> xxxExp ... etc.
@@ -40,7 +40,7 @@ class App extends React.Component<{}, State>
 			lg('[Attempted to calculate an undefined value]');
 
 			if (e instanceof UndefExpError) 
-				result = UNDEF_EXP.name();	
+				result = 'cannot be evaluated: UNDEFINED'
 			else
 				throw(e);	// some other error...
 		}
@@ -76,13 +76,13 @@ class App extends React.Component<{}, State>
 
 	updateState = () => 
 	{
-		this.setState( this.createState(this.state.dummyRoot) );
 		lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
+		this.setState( this.createState(this.state.dummyRoot) );
 	}
 
 	updateDummyRoot = (e: Exp) =>
 	{
-		(this.state.dummyRoot as NotExp).setSubExp(e);		
+		(this.state.dummyRoot).setSubExp(e);		
 		this.setState(this.createState(this.state.dummyRoot));
 
 		return e;
@@ -92,10 +92,10 @@ class App extends React.Component<{}, State>
 	{
 		return (
 			<div className="app">
-				<header className="app-header tac bot-margin">
+				<header className="app-header tal bot-margin">
 					De-luxe Boolean Expression Calculator
-					<p className='sm-font'>for all your boolean evaluation needs</p>
-					<p className='sm-font'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
+					<p className='md-font tal'>for all your boolean evaluation needs</p>
+					<p className='md-font tal'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
 				</header>
 
 				<div className='tal lg-font flex-horiz'>
@@ -104,7 +104,7 @@ class App extends React.Component<{}, State>
 				</div>
 				<div className='tal lg-font flex-horiz bot-margin'>
 					<p className='exp-width'>RESULT:</p> 
-					<p className='exp-width'>{this.state.result}</p>
+					<p className=''>{this.state.result}</p>
 				</div>
 
 				<ExpView
