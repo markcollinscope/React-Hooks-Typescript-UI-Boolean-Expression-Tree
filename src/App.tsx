@@ -99,11 +99,11 @@ class App extends React.Component<{}, State>
 				</header>
 
 				<div className='tal lg-font flex-horiz'>
-					<p className='exp-width'>EXPRESSION:</p> 
+					<p className='exp-width'>Expression:</p> 
 					<p className=''>{this.state.textExp}</p>
 				</div>
 				<div className='tal lg-font flex-horiz bot-margin'>
-					<p className='exp-width'>RESULT:</p> 
+					<p className='exp-width'>Result:</p> 
 					<p className=''>{this.state.result}</p>
 				</div>
 
