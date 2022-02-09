@@ -27,7 +27,7 @@ export function ConstExpView(props: Props)
 		return (
 			<option
 				//
-				className={'option-txt'}
+				className={'option-txt md-font'}
 				key={k}
 				value={k}
 			> 
@@ -37,7 +37,7 @@ export function ConstExpView(props: Props)
 	}
 
 	return (
-		<select className='option-txt'
+		<select className='option-txt md-font'
 			size={1} 
 			onChange={handleSelect}
 			value={selectedItem}

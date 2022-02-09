@@ -7,9 +7,6 @@ import { ExpView } from './ExpView'
 // Domain
 import { UNDEF_EXP, Exp, NotExp, UndefExpError  } from './Exp'
 
-// visuals
-import './style.css';
-
 /* 	dummyRootExp is the parent of the actual Exp to be shown.
     
     (App)         (has dropdown)
