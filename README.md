@@ -6,6 +6,7 @@
 
 # SOURCE CODE STRUCTURE (SEE src DIR)
 
+```
 [ key: X ---> Y: X depends on (imports from) Y. ]
 
 App.tsx (interface) [----> Exp too]
@@ -22,6 +23,7 @@ ExpView.tsx (interface)             Exp.test.ts (test)
    |-----------|
    V           V
 AppEror.ts  utils.ts (infrastructure) (nb: most modules use these, as is normal)
+```
 
 * no cycles, etc in dependencies.
 * seperation of business logic and UI code and infrastructure
