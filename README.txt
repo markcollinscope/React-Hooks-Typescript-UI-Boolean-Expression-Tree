@@ -25,12 +25,13 @@ AppEror.ts  utils.ts (infrastructure) (nb: most modules use these, as is normal)
 
 * no cycles, etc in dependencies.
 * seperation of business logic and UI code and infrastructure
-* see also: https://www.infoq.com/articles/arm-enterprise-applications - for architectural basis (this is a bit small, so only partially fits).
+* see also: https://www.infoq.com/articles/arm-enterprise-applications - for the architectural basis of modules subdivision;
+  this app is is quite small, so doesn't need all the 'strata' - in particular there's no need for an 'application strata' here).
 
 # SOURCE STYLE
 
 * OO Style adopted (Expression evaluation is very suited to this)
-* React classes used (well, it is Typescript - an OO/class based language)
+* React classes used (well, it is Typescript - an OO/class based language, and it is not difficult to use classes with React)
 * Important stuff: OAOO (once and only once), DRY (don't repeat yourself), single source of change for constant values, exporting of const values... SRP, CCP, ...
 
 other:
