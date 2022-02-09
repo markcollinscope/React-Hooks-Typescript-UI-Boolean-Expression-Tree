@@ -1,6 +1,6 @@
 // Abstraction of the concept of a boolean expression.
 // Deals with creation and calcution of such expressions, including constants values, 
-// binary operations, unary operations (well NOT), and undefined values.
+// binary operations, unary operations (well NOT_OP), and undefined values.
 
 // The code here does Not deal with UI - this code is 'functional' (business) logic only.
 // It is used by the UI code to create, modify and evaluate the expressions contained herein.
@@ -36,6 +36,7 @@ class UndefExp extends Exp // no export - immutable Undef Exp value created and 
 }
 export const UNDEF_EXP = new UndefExp();
 export const UNDEF = UNDEF_EXP.name();
+const throwIfUndefined = (arrExp: Exp[]) => arrExp.forEach( (v) => { if (v === UNDEF_EXP) throw new UndefExpError(); });
 
 //******
 class ConstExp extends Exp // no export - T, F immutable Exp values created and exported.
@@ -70,7 +71,7 @@ export class NotExp extends Exp
 	name = () => 'Not';
 	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
 }
-export const NOT = (new NotExp()).name();
+export const NOT_OP = (new NotExp()).name();
 
 //******
 const LHS = '_LHS_'
@@ -82,18 +83,18 @@ export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
-// create BinExp with AND or OR op.
-export const AND = 	'AND';
-export const OR = 	'OR';
+// create BinExp with AND_OP or OR_OP op.
+export const AND_OP = 	'And';
+export const OR_OP = 	'Or';
 export class BinExp extends Exp
 {
 	private subexp: { [index: string] : Exp } = {};
 
-	// extensible approach - add 'NAND' - just follow the pattern!
-	private static calcFn: { [index: string]: ( (lh: Exp, rh: Exp) => boolean ) } =
+	// extensible approach - add 'NAND_OP' - just follow the pattern!
+	private static calcFn: { [index: string]: ( (l: Exp, r: Exp) => boolean ) } =
 	{
-		AND: (lh: Exp, rh: Exp) => lh.calc() && rh.calc(),
-		OR:  (lh: Exp, rh: Exp) => lh.calc() || rh.calc()
+		[AND_OP]: (l: Exp, r: Exp) => l.calc() && r.calc(),
+		[OR_OP]:  (l: Exp, r: Exp) => l.calc() || r.calc()
 	}
 
 	// lhs/rhs - left/right hand side (of subexpression), etc.
@@ -111,6 +112,12 @@ export class BinExp extends Exp
 	getRhsExp = () => this.subexp[RHS];
 
 	name = () => this.op;
-	calc = () => BinExp.calcFn[this.op]( this.getLhsExp(), this.getRhsExp() );
 	expand = () => this.name() + LB + this.getLhsExp().expand() + SEPERATOR + this.getRhsExp().expand() + RB;
+	calc = () => 
+	{ 
+		const l = this.getLhsExp(), r = this.getRhsExp(); 
+		throwIfUndefined([l, r]); 
+
+		return BinExp.calcFn[this.op](l,r);
+	}
 }

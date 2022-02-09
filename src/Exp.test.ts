@@ -3,7 +3,7 @@ import { assert } from './utils';
 import { AppError } from './AppError'
 
 import {
-	AND, OR, Exp, BinExp, FALSE_EXP, TRUE_EXP, NOT, UndefExpError, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
+	AND_OP, OR_OP, Exp, BinExp, FALSE_EXP, TRUE_EXP, NOT_OP, UndefExpError, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
 // Tests (part 1)
@@ -43,38 +43,38 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 		assert( not.expand() === notname + LB + fname + RB );
 	});
 
-	it('** AND expressions evaluation correctly', function()
+	it('** AND_OP expressions evaluation correctly', function()
 	{
 
-		assert( new BinExp( AND, TRUE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( AND, TRUE_EXP, FALSE_EXP ).calc() );
-		assert( ! new BinExp( AND, FALSE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( AND, FALSE_EXP, FALSE_EXP ).calc() );
+		assert( new BinExp( AND_OP, TRUE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( AND_OP, TRUE_EXP, FALSE_EXP ).calc() );
+		assert( ! new BinExp( AND_OP, FALSE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( AND_OP, FALSE_EXP, FALSE_EXP ).calc() );
 	});
 
-	it('** OR expressions evaluation correctly', function()
+	it('** OR_OP expressions evaluation correctly', function()
 	{
-		assert( new BinExp( OR, TRUE_EXP, TRUE_EXP ).calc() );
-		assert( new BinExp( OR, TRUE_EXP, FALSE_EXP ).calc() );
-		assert( new BinExp( OR, FALSE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( OR, FALSE_EXP, FALSE_EXP ).calc() );
+		assert( new BinExp( OR_OP, TRUE_EXP, TRUE_EXP ).calc() );
+		assert( new BinExp( OR_OP, TRUE_EXP, FALSE_EXP ).calc() );
+		assert( new BinExp( OR_OP, FALSE_EXP, TRUE_EXP ).calc() );
+		assert( ! new BinExp( OR_OP, FALSE_EXP, FALSE_EXP ).calc() );
 	});
 
-	it('** AND / OR expressions expand to strings correctly', function()
+	it('** AND_OP / OR_OP expressions expand to strings correctly', function()
 	{
 		const t = TRUE_EXP.name();
 
-		assert( new BinExp( AND, TRUE_EXP, TRUE_EXP ).expand() === AND + LB + t + SEPERATOR + t + RB);
-		assert( new BinExp( OR, TRUE_EXP, TRUE_EXP ).expand() === OR + LB + t + SEPERATOR + t + RB);
+		assert( new BinExp( AND_OP, TRUE_EXP, TRUE_EXP ).expand() === AND_OP + LB + t + SEPERATOR + t + RB);
+		assert( new BinExp( OR_OP, TRUE_EXP, TRUE_EXP ).expand() === OR_OP + LB + t + SEPERATOR + t + RB);
 	});
 
 	it('** Deeper nested expression with UNDEF throws exception', function() 
 	{
 		const e = 
 			new BinExp( 
-				AND,
+				AND_OP,
 				new BinExp( 
-					OR,
+					OR_OP,
 					TRUE_EXP,
 					FALSE_EXP
 				)
@@ -87,27 +87,27 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 	it('** Deeper nested expression expands to string correctly', function() 
 	{
 		const e = 
-			new BinExp( // AND 
-				AND,
-				new BinExp( // OR ( T, F)
-					OR, 
+			new BinExp( // AND_OP 
+				AND_OP,
+				new BinExp( // OR_OP ( T, F)
+					OR_OP, 
 					TRUE_EXP,
 					FALSE_EXP
 				),
-				new NotExp( FALSE_EXP ) // NOT ( F )
+				new NotExp( FALSE_EXP ) // NOT_OP ( F )
 			);
 		
-		// AND(OR(TRUE,FALSE),NOT(FALSE))
-		assert( e.expand() === AND + LB + OR + LB + TRUE + SEPERATOR + FALSE + RB + SEPERATOR + NOT + LB + FALSE + RB + RB );
+		// AND_OP(OR_OP(TRUE,FALSE),NOT_OP(FALSE))
+		assert( e.expand() === AND_OP + LB + OR_OP + LB + TRUE + SEPERATOR + FALSE + RB + SEPERATOR + NOT_OP + LB + FALSE + RB + RB );
 	});
 
 	it('** Deeper nested expression evaluates correctly', function() 
 	{
 		const e = 
 			new BinExp( // TRUE
-				AND,
+				AND_OP,
 				new BinExp( // TRUE.
-					OR, 
+					OR_OP, 
 					TRUE_EXP,
 					FALSE_EXP
 				),

@@ -5,7 +5,7 @@ import React from 'react';
 import { ExpView } from './ExpView'
 
 // Domain
-import { UNDEF_EXP, Exp, NotExp, UndefExpError  } from './Exp'
+import { UNDEF_EXP, Exp, NotExp, UndefExpError, TRUE, FALSE, UNDEF  } from './Exp'
 
 /* 	dummyRoot(Exp) is the parent of the actual Exp to be shown.
     
@@ -33,14 +33,14 @@ class App extends React.Component<{}, State>
 		let result = ''; 
 
 		try {
-			result = dummyRoot.getSubExp().calc() ? 'TRUE' : 'FALSE';
+			result = dummyRoot.getSubExp().calc() ? TRUE : FALSE;
 		}
 		catch (e)
 		{
 			lg('[Attempted to calculate an undefined value]');
 
 			if (e instanceof UndefExpError) 
-				result = 'cannot be evaluated: UNDEFINED'
+				result = UNDEF;
 			else
 				throw(e);	// some other error...
 		}
@@ -59,9 +59,9 @@ class App extends React.Component<{}, State>
 		for debug or personal amusement(!), try:
 			new NotExp( 
 				new BinExp( 
-					OR, 
+					OR_OP, 
 					new BinExp( 
-						AND, 
+						AND_OP, 
 						new NotExp( new NotExp( new NotExp(TRUE_EXP) ) ), 
 						new NotExp(FALSE_EXP) 	
 					), 
@@ -95,7 +95,7 @@ class App extends React.Component<{}, State>
 				<header className="app-header tal bot-margin">
 					De-luxe Boolean Expression Calculator
 					<p className='md-font tal'>for all your boolean evaluation needs</p>
-					<p className='md-font tal'>please *upgrade* to paid edition (only EU99.99/month) to access our patented XOR functionality</p>
+					<p className='md-font tal'>please *upgrade* to paid edition (only EU99.99/month) to access our exclusive or functionality (yes, XOR!)</p>
 				</header>
 
 				<div className='tal lg-font flex-horiz'>

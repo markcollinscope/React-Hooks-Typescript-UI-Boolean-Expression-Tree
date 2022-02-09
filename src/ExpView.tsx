@@ -10,7 +10,7 @@ import { lg } from './utils'
 // basic case - UNDEF, TRUE or FALSE value.
 
 // expression logic and constants.
-import { Exp, BinExp, NotExp, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT, AND, OR, UNDEF, TRUE, FALSE } from './Exp';
+import { Exp, BinExp, NotExp, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE } from './Exp';
 
 
 interface Props
@@ -29,12 +29,12 @@ export type OptionCbType = {[index: string]: () => Exp};
 
 const dropDownCbs =
 {
-	UNDEF:	() => { lg("Dropdown select: ", UNDEF); return UNDEF_EXP; },
-	TRUE: 	() => { lg("Dropdown select: ", TRUE); return TRUE_EXP; },
-	FALSE: 	() => { lg("Dropdown select: ", FALSE); return FALSE_EXP; },
-	AND:	() => { lg("Dropdown select: ", AND); return new BinExp(AND); },
-	OR:		() => { lg("Dropdown select: ", OR); return new BinExp(OR); },
-	NOT:	() => { lg("Dropdown select: ", NOT); return new NotExp(); }
+	[UNDEF]:	() => { lg("Dropdown select: ", UNDEF); return UNDEF_EXP; },
+	[TRUE]: 	() => { lg("Dropdown select: ", TRUE); return TRUE_EXP; },
+	[FALSE]: 	() => { lg("Dropdown select: ", FALSE); return FALSE_EXP; },
+	[AND_OP]:	() => { lg("Dropdown select: ", AND_OP); return new BinExp(AND_OP); },
+	[OR_OP]:	() => { lg("Dropdown select: ", OR_OP); return new BinExp(OR_OP); },
+	[NOT_OP]:	() => { lg("Dropdown select: ", NOT_OP); return new NotExp(); }
 } as OptionCbType;
 
 // Recursively instantiated React class. 
