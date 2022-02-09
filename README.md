@@ -42,7 +42,6 @@ AppEror.ts  utils.ts (infrastructure) (nb: most modules use these, as is normal)
 other:
 * I have used a certain style here - normally I just go with whatever is the project standard, if there is one. It's not that important (to me).
 * nb: wars have been fought over the position of a curly brace... beware! :-).
-
 * import/export used (rather than 'require ...'')
 * Class (capital first letter for name)
 * variableOfSomeSort (lower case, camel-case style [sometimes])
