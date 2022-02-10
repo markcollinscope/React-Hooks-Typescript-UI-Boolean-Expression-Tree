@@ -1,6 +1,6 @@
 // Abstraction of the concept of a boolean expression.
-// Deals with creation and calcution of such expressions, including constants values, 
-// binary operations, unary operations (well NOT_OP), and undefined values.
+// Deals with creation and calcution of such expressions, including constants values (T, F), 
+// binary operations, unary operations (well NOT_OP only at the moment), and undefined values.
 
 // The code here does Not deal with UI - this code is 'functional' (business) logic only.
 // It is used by the UI code to create, modify and evaluate the expressions contained herein.
@@ -74,23 +74,23 @@ export class NotExp extends Exp
 export const NOT_OP = (new NotExp()).name();
 
 //******
-const LHS = '_Left_'
-const RHS = '_Right_'
+const LHS = '_Left_'	// arbitrary value.
+const RHS = '_Right_'	// arbitrary value.
 
-// for formatting of expressions when converting to string version of the expression.
+// for formatting of expressions when converting to expanded (string) visual representation.
 // exported for tests (only).
 export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
-// create BinExp with AND_OP or OR_OP op.
+// create BinExp (binary operator) with AND_OP or OR_OP op. nb: AND_OP etc. are used for visuals when expanded to string.
 export const AND_OP = 	'And';
 export const OR_OP = 	'Or';
 export class BinExp extends Exp
 {
 	private subexp: { [index: string] : Exp } = {};
 
-	// extensible approach - add 'NAND_OP' - just follow the pattern!
+	// extensible approach - add 'NAND_OP' - just follow the pattern! nb: need to modify ExpView as well.
 	private static calcFn: { [index: string]: ( (l: Exp, r: Exp) => boolean ) } =
 	{
 		[AND_OP]: (l: Exp, r: Exp) => l.calc() && r.calc(),

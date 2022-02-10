@@ -1,8 +1,10 @@
+// visuals for TRUE, FALSE and UNDEF.
+
 import * as React from 'react';
 
 interface Props
 {	
-	onSelect:	(v: string) => void;
+	onSelect:	(s: string) => void;
 	options:	string[];
 	selected:	string;
 }
@@ -12,7 +14,7 @@ export function ConstExpView(props: Props)
 	const optionNames = props.options;
 	const selectedItem = optionNames.indexOf(props.selected);
 	
-	// naughty ... (the 'any' - forgive me!)
+	// naughty ... (the 'any' here - forgive me!)
 	const handleSelect = (event: any): void =>
 	{
 		event.preventDefault();

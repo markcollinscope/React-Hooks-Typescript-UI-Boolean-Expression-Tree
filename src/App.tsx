@@ -1,10 +1,10 @@
 import { lg } from './utils';
 
-// UI (Interface)
+// UI (Interface).
 import React from 'react';
 import { ExpView } from './ExpView'
 
-// Domain
+// Domain.
 import { UNDEF_EXP, Exp, NotExp, UndefExpError, TRUE, FALSE, UNDEF  } from './Exp'
 
 /* 	dummyRoot(Exp) is the parent of the actual Exp to be shown.
@@ -13,19 +13,26 @@ import { UNDEF_EXP, Exp, NotExp, UndefExpError, TRUE, FALSE, UNDEF  } from './Ex
     dummyRoot ---> visibleRoot-------------------------> xxxExp ... etc.
                        |-------------------------------> xxxExp ... etc.     
 	
-	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' if reference form
+	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' in reference form
 	for this to happen. Selecting a new option (from the dropdown menu of visibleRoot) changes the visibleRoot
-	by updating the reference held indummyRoot.
+	by updating the reference held in dummyRoot.
 */
 
-class DummyRoot extends NotExp {} // purely for clarity of intent... no functional difference - used as a container for visibleRoot.
+/* uncomment for PLAY option -see below
+
+import  {BinExp, FALSE_EXP, TRUE_EXP, AND_OP, OR_OP } from './Exp';
+
+*/
+
+// purely for clarity of intent... no functional difference - used as a container for visibleRoot.
+class DummyRoot extends NotExp {}
 
 class State
 {
 	constructor(public dummyRoot: DummyRoot, public result: string, public textExp: string) {};
 }
 
-class App extends React.Component<{}, State> 
+class App extends React.Component<{}, State>
 {
 	createState = (dummyRoot: DummyRoot): State =>
 	{
@@ -55,8 +62,10 @@ class App extends React.Component<{}, State>
 		super(props);
 
 		const startExp = UNDEF_EXP;
-		/* 	
-		for debug or personal amusement(!), try:
+		
+		/* 	PLAY: for debug or personal amusement(!), comment out UNDEF_EXP
+			and try: (nb: uncomment import marked PLAY above, as well) 
+		
 			new NotExp( 
 				new BinExp( 
 					OR_OP, 
@@ -69,7 +78,7 @@ class App extends React.Component<{}, State>
 				) 
 			); 
 		*/
-
+		
 		const dummyRoot = new DummyRoot(startExp);
 		this.state = this.createState(dummyRoot);
 	}
@@ -82,7 +91,7 @@ class App extends React.Component<{}, State>
 
 	updateDummyRoot = (e: Exp) =>
 	{
-		(this.state.dummyRoot).setSubExp(e);		
+		this.state.dummyRoot.setSubExp(e);		
 		this.setState(this.createState(this.state.dummyRoot));
 
 		return e;

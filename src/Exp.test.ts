@@ -26,7 +26,7 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 		assert( ! FALSE_EXP.calc() );
 	});
 
-	it('** Not (Uni) expression evaluates correctly', function()
+	it('** Not expression evaluates correctly', function()
 	{
 		assert( new NotExp(FALSE_EXP).calc() );
 		assert( ! new NotExp(TRUE_EXP).calc() );
