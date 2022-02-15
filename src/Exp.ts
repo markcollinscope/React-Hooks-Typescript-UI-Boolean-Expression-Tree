@@ -16,7 +16,8 @@ export class UndefExpError extends AppError
 }
 
 //******
-export class Exp  // abstract base class.
+// abstract base class - which Typescript doesn't support directly, hence the progError stuff...
+export class Exp  
 {
 	name = (): string | never => progError();
 	expand = (): string | never => progError();
@@ -34,8 +35,11 @@ class UndefExp extends Exp // no export - immutable Undef Exp value created and 
 		throw new UndefExpError(); 
 	} 
 }
-export const UNDEF_EXP = new UndefExp();
-export const UNDEF = UNDEF_EXP.name();
+export const UNDEF_EXP = 	new UndefExp();
+export const UNDEF = 		UNDEF_EXP.name();
+
+// a useful technique - a function that can be called to do checking - and can throw an exception if there's a problem.
+// its useful because it makes the client code far cleaner without losing anything.
 const throwIfUndefined = (arrExp: Exp[]) => arrExp.forEach( (v) => { if (v === UNDEF_EXP) throw new UndefExpError(); });
 
 //******
@@ -50,10 +54,13 @@ class ConstExp extends Exp // no export - T, F immutable Exp values created and 
 	name = () => this.value ? 'True' : 'False';
 	expand = () => this.name();
 }
-export const TRUE_EXP = new ConstExp(true);
-export const FALSE_EXP = new ConstExp(false);
-export const TRUE = TRUE_EXP.name();
-export const FALSE = FALSE_EXP.name();
+export const TRUE_EXP = 	new ConstExp(true);		// these are Expression types.
+export const FALSE_EXP = 	new ConstExp(false);
+export const TRUE = 		TRUE_EXP.name();		// these are string types.
+export const FALSE = 		FALSE_EXP.name();
+
+// discussion: arguably there could be a UniExp type (unary expressions - one arg, one operator).
+// however as it stands, doesn't seem worth it. what other unary expressions could there be :).
 
 //******
 export class NotExp extends Exp
@@ -84,17 +91,32 @@ export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
 // create BinExp (binary operator) with AND_OP or OR_OP op. nb: AND_OP etc. are used for visuals when expanded to string.
-export const AND_OP = 	'And';
+// nb: a valid criticism here coud be the the use of AND_OP, etc. in the UI conflates the business logic and the visual aspects
+// of the system. As it stands, there's no real impact of violating 'best practice' rule - but that could change if this were
+// extended further... so that should always be borne in mind.
+export const AND_OP =   'And';
 export const OR_OP = 	'Or';
+export const NAND_OP = 	'Nand';
+export const NOR_OP =  	'Nor';
+export const XOR_OP = 	'Xor';
+
 export class BinExp extends Exp
 {
 	private subexp: { [index: string] : Exp } = {};
 
-	// extensible approach - add 'NAND_OP' - just follow the pattern! nb: need to modify ExpView as well.
+	// extensible approach - though this is not strictly an OO approach, more a hybrid OO & FP approach.
 	private static calcFn: { [index: string]: ( (l: Exp, r: Exp) => boolean ) } =
 	{
-		[AND_OP]: (l: Exp, r: Exp) => l.calc() && r.calc(),
-		[OR_OP]:  (l: Exp, r: Exp) => l.calc() || r.calc()
+		[AND_OP]: (l: Exp, r: Exp) => 	l.calc() && r.calc(),
+		[OR_OP]:  (l: Exp, r: Exp) => 	l.calc() || r.calc(),
+		[NAND_OP]: (l: Exp, r: Exp) =>  !( l.calc() && r.calc() ),
+		[NOR_OP]:  (l: Exp, r: Exp) => 	!( l.calc() || r.calc() ),
+		[XOR_OP]: (l: Exp, r: Exp) =>  	
+		{
+			const lv =  l.calc();
+			const rv = 	r.calc();
+			return (lv && !rv) || (rv && !lv);
+		}
 	}
 
 	// lhs/rhs - left/right hand side (of subexpression), etc.

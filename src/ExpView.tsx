@@ -7,33 +7,41 @@
 import React from 'react';
 import { ConstExpView } from './ConstExpView';
 
+// debug... remove from production code (or extend with a proper logging mechanism).
 import { lg } from './utils'
 
 // boolean expressions - core logic, types(classes) and constants.
-import { Exp, BinExp, NotExp, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE } from './Exp';
+// as this list has grown, I would now 
+// "import * as exp from './Exp"' - soon!
+import { Exp, BinExp, NotExp, XOR_OP, NAND_OP, NOR_OP, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE } from './Exp';
+import { preProcessFile } from 'typescript';
 
 interface Props
 {
-	exp: Exp;
+	exp: 			Exp;
 	parentUpdateFn:	(e: Exp) => Exp;
 	globalUpdateFn: () => void;
 };
 
-class State
+interface State
 {
-	constructor(public thisExpRoot: Exp, public selected: string) {}
+	thisExpRoot: 	Exp;
+	selected: 		string;
 };
 
-export type OptionCbType = {[index: string]: () => Exp};
+export type OptionCbType = { [index: string]: () => Exp };
 
 const dropDownCbs =
 {
 	[UNDEF]:	() => { lg("Dropdown select: ", UNDEF); return UNDEF_EXP; },
 	[TRUE]: 	() => { lg("Dropdown select: ", TRUE); return TRUE_EXP; },
 	[FALSE]: 	() => { lg("Dropdown select: ", FALSE); return FALSE_EXP; },
+	[NOT_OP]: 	() => { lg("Dropdown select: ", NOT_OP); return new NotExp(); },
 	[AND_OP]:	() => { lg("Dropdown select: ", AND_OP); return new BinExp(AND_OP); },
 	[OR_OP]:	() => { lg("Dropdown select: ", OR_OP); return new BinExp(OR_OP); },
-	[NOT_OP]:	() => { lg("Dropdown select: ", NOT_OP); return new NotExp(); }
+	[NAND_OP]: 	() => { lg("Dropdown select: ", NAND_OP); return new BinExp(NAND_OP); },
+	[NOR_OP]: 	() => { lg("Dropdown select: ", NOR_OP); return new BinExp(NOR_OP); },
+	[XOR_OP]: () => { lg("Dropdown select: ", 	XOR_OP); return new BinExp(OR_OP); }
 } as OptionCbType;
 
 // Recursively instantiated React class. 
@@ -43,7 +51,11 @@ export class ExpView extends React.Component<Props, State>
 	constructor(props: Props)
 	{
 		super(props);
-		this.state = new State(props.exp, props.exp.name());
+		this.state =
+		{
+			thisExpRoot = 	props.exp;
+			selected =		
+		}
 	}
 
 	handleDropDownUpdate = (value: string) =>
@@ -52,13 +64,20 @@ export class ExpView extends React.Component<Props, State>
 
 		lg("Dropdown Select Exp Now: ", newRoot.expand())
 
-		const newState = new State(newRoot, value);
+		// const newState = new State(newRoot, value);
+
+		let newState: State = this.state;
 		this.setState(newState);
 		this.props.globalUpdateFn();
 	}
 
 	render()
 	{
+		// What I don't like about this:
+		// - the "instanceof" checks and enclosing "if" expressions being the way they are.
+		// - an array (indexed by Type) of render-returning functions would be more easily extensible.
+		// - would be more elegant.
+
 		// basic case - UNDEF, TRUE or FALSE value.
 		let viewExpToReturn = 
 			<div className='bdr md-font exp-width'>
@@ -69,10 +88,9 @@ export class ExpView extends React.Component<Props, State>
 			/>
 			</div>
 
-
 		if (this.props.exp instanceof NotExp)
 		{
-			const notExp = this.props.exp as NotExp // downcast to subclass.
+			const notExp = this.props.exp;
 		
 			viewExpToReturn = 
 				<div>
@@ -90,7 +108,9 @@ export class ExpView extends React.Component<Props, State>
 	
 		if (this.props.exp instanceof BinExp)
 		{
-			const binExp = this.props.exp as BinExp;
+			// as has been pointed out to me (previously there was a downcast here - we can assume that 
+			// Typescript knows this is a BinExp, not just an Exp.
+			const binExp = this.props.exp;
 
 			viewExpToReturn = 
 				<div>
