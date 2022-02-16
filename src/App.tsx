@@ -104,7 +104,7 @@ class App extends React.Component<{}, State>
 				<header className="app-header tal bot-margin">
 					De-luxe Boolean Expression Calculator
 					<p className='md-font tal'>for all your boolean evaluation needs</p>
-					<p className='md-font tal'>please *upgrade* to paid edition (only EU99.99/month) to access our exclusive or functionality (yes, XOR!)</p>
+					<p className='md-font tal'>Thanks for upgrading - you can now use: Xor, Nand and Nor</p>
 				</header>
 
 				<div className='tal lg-font flex-horiz'>

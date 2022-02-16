@@ -14,7 +14,6 @@ import { lg } from './utils'
 // as this list has grown, I would now 
 // "import * as exp from './Exp"' - soon!
 import { Exp, BinExp, NotExp, XOR_OP, NAND_OP, NOR_OP, UNDEF_EXP, TRUE_EXP, FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE } from './Exp';
-import { preProcessFile } from 'typescript';
 
 interface Props
 {
@@ -33,15 +32,15 @@ export type OptionCbType = { [index: string]: () => Exp };
 
 const dropDownCbs =
 {
-	[UNDEF]:	() => { lg("Dropdown select: ", UNDEF); return UNDEF_EXP; },
-	[TRUE]: 	() => { lg("Dropdown select: ", TRUE); return TRUE_EXP; },
-	[FALSE]: 	() => { lg("Dropdown select: ", FALSE); return FALSE_EXP; },
-	[NOT_OP]: 	() => { lg("Dropdown select: ", NOT_OP); return new NotExp(); },
-	[AND_OP]:	() => { lg("Dropdown select: ", AND_OP); return new BinExp(AND_OP); },
-	[OR_OP]:	() => { lg("Dropdown select: ", OR_OP); return new BinExp(OR_OP); },
-	[NAND_OP]: 	() => { lg("Dropdown select: ", NAND_OP); return new BinExp(NAND_OP); },
-	[NOR_OP]: 	() => { lg("Dropdown select: ", NOR_OP); return new BinExp(NOR_OP); },
-	[XOR_OP]: () => { lg("Dropdown select: ", 	XOR_OP); return new BinExp(OR_OP); }
+	[UNDEF]:	() => { lg("Dropdown select: ", UNDEF); 	return UNDEF_EXP; },
+	[TRUE]: 	() => { lg("Dropdown select: ", TRUE); 		return TRUE_EXP; },
+	[FALSE]: 	() => { lg("Dropdown select: ", FALSE); 	return FALSE_EXP; },
+	[NOT_OP]: 	() => { lg("Dropdown select: ", NOT_OP);	return new NotExp(); },
+	[AND_OP]:	() => { lg("Dropdown select: ", AND_OP);	return new BinExp(AND_OP); },
+	[OR_OP]:	() => { lg("Dropdown select: ", OR_OP); 	return new BinExp(OR_OP); },
+	[NAND_OP]: 	() => { lg("Dropdown select: ", NAND_OP); 	return new BinExp(NAND_OP); },
+	[NOR_OP]: 	() => { lg("Dropdown select: ", NOR_OP); 	return new BinExp(NOR_OP); },
+	[XOR_OP]: 	() => { lg("Dropdown select: ", XOR_OP); 	return new BinExp(XOR_OP); }
 } as OptionCbType;
 
 // Recursively instantiated React class. 
@@ -53,8 +52,8 @@ export class ExpView extends React.Component<Props, State>
 		super(props);
 		this.state =
 		{
-			thisExpRoot = 	props.exp;
-			selected =		
+			thisExpRoot: 	props.exp,
+			selected:		props.exp.name()
 		}
 	}
 
@@ -62,12 +61,11 @@ export class ExpView extends React.Component<Props, State>
 	{
 		const newRoot = this.props.parentUpdateFn( dropDownCbs[value]() );
 
-		lg("Dropdown Select Exp Now: ", newRoot.expand())
-
-		// const newState = new State(newRoot, value);
-
-		let newState: State = this.state;
+		let newState = this.state as State;
+		newState.thisExpRoot = newRoot;
 		this.setState(newState);
+		
+		// i don't like having to use this fn so much... ongoing...
 		this.props.globalUpdateFn();
 	}
 
@@ -75,8 +73,8 @@ export class ExpView extends React.Component<Props, State>
 	{
 		// What I don't like about this:
 		// - the "instanceof" checks and enclosing "if" expressions being the way they are.
-		// - an array (indexed by Type) of render-returning functions would be more easily extensible.
-		// - would be more elegant.
+		// - an array (indexed by Exp Type) of render-returning functions would be more easily extensible.
+		// - and would be more elegant.
 
 		// basic case - UNDEF, TRUE or FALSE value.
 		let viewExpToReturn = 

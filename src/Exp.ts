@@ -2,6 +2,21 @@
 // Deals with creation and calcution of such expressions, including constants values (T, F), 
 // binary operations, unary operations (well NOT_OP only at the moment), and undefined values.
 
+/*
+	Here's the grammar the Exp inheritance tree conforms to (or enables) below... (BNF format-ish):
+
+	Exp ::= Exp | UndefExp | ConstExp | BinExp | NotExp
+	NotExp :== 'Not' Exp 
+
+	BinExp :== BinOp Exp Exp 	// nb: in this example at present, BinExp class does all of the BinOps...
+	BinOp ::= 'And' | 'Or' | 'Xor' | 'Nand' | 'NorExp'
+
+	ConstExp ::= TrueExp | FalseExp (no seperate class for these, could be though).
+	UndefExp ::= 'Undefined'
+	TrueExp ::= 'True'
+	FalseExp ::= 'False'
+*/
+
 // The code here does Not deal with UI - this code is 'functional' (business) logic only.
 // It is used by the UI code to create, modify and evaluate the expressions contained herein.
 
@@ -60,7 +75,7 @@ export const TRUE = 		TRUE_EXP.name();		// these are string types.
 export const FALSE = 		FALSE_EXP.name();
 
 // discussion: arguably there could be a UniExp type (unary expressions - one arg, one operator).
-// however as it stands, doesn't seem worth it. what other unary expressions could there be :).
+// however as it stands, doesn't seem worth it. what other unary expressions could there be :-) - an identity op?
 
 //******
 export class NotExp extends Exp
