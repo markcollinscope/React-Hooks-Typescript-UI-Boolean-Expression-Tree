@@ -1,0 +1,37 @@
+Hi Satchei,
+
+Thanks for the reply,
+
+[I'm being forthright below - however  nothing is personal, it's an engineering discussion.. So don't get upset, please and come back with whatever comments you like, because I certainly won't. But be sure you can really justify them - because what you've said above has a lot of holes in it]
+
+Re: differences of Opinion on OOP. Well, its not about *opinions* it's about hard engineering reasoning. Look, I gave up the style of procedural programming when I stopped writing C (25 yrs ag). Moved onto C++, classes - multiple inheritance (which a lot people still don't get). The transition in general from Procedural to the OO style didn't happen because it was the latest fashion (which seems to be the main motivation for doing anything in the JS world) but because the size of problems being dealt with was increasing significantly.... and there was a very strong need to be able to manage the increasing complexity. That is done by managing coupling and cohesion and encapsulating data as much as possible. Without that , one ends up with the sort of problems you seem to be describing with your complexity of components  issue. (I've developed very complex hierarchical component based UIs in React/Typescript - and following a few basic principles (encapsulate state being one) it was not a big deal. *Nothing* that is being done in React is new. The same issues arise developing native MS$ Windows interfaces, native XWindows interfaces on Linux, and probably on Macs to - tho I haven't done that.  And again, that was part of the motivation behind OO (or Object Based - if you want to leave out the inheritance and just focus on encapsulating state).
+
+If we're honest about it (and I'm not talking about you or your team). The real reason there's an aversion to OO in the JS  world is the people doing coding just don't cut it intellectually. That's what happens when there's a massive increase in demand - which the web, etc. has caused. And you guys might bear in mind - if you just follow the JS crowd approach, then you'll never differentiate yourselves. Which you could do! 
+
+ The real scalability issues in software engineering come from managing complexity and restricting the impact of any particular change as much as possible). There may be others server side (with 1 billion concurrent users )  but I've never had any issue with one puny user doing something on a  UI.  Really. So if people have a lot of issues with that its a huge 'fucked up' design smell. (BTW: I didnt trigger-a-main- application update- function so much. So if you have an alternative please enlighten me (but don't say I should change the structure of my whole design to accomodate a React deficiency - I mean - it is support to understand state changes...).
+
+Anyway, by the time I got to that I didn't have  time to do any more as  *I'd done a full solution to the problem*, (which to do correctly following good software engineering practise, a complete solution... isn't two hours worth - let's be honest...).
+
+*** Important Bit ***
+But I'm happy to be proved wrong - so  put your money where your mouth is and Send me what you consider a full Well Engineered Solution*  to the problem. 
+
+Because, what you describe doesn't sound particularly good to me (I'm waiting to heard the 'redux' word next...).. I'm sure you can 
+back up what you say with working code... no?
+
+Re: Complexity of React component. There is None in the ExpView. It has zero logic other than working out what type of expression it is dealing with. Full stop.  So I don't know what you mean about being 'too complex'  (Question here - would you even use recursion in solving this problem?) In my code all the complexity is Where it belongs in the Exp code. In a real app, that code would very likely be isomorphic (shared client/server - you do do that, I'm sure) and there might well be an REST API that wants to  build similar data structures to those built by the UI. This is a pretty common pattern
+
+
+Re: copying state on the downward recursion (which tends to happen with naturally recursive problems) - so you're saying it is a big deal to copy 64 bits of (a reference to the head of the Expression tree) from one place to another? Performance, come on... It's the excuse every JSer (who has no background in other languages out there) comes up with to explain away what is basically Very Poor Design. But do explain:
+- copying a reference to a sub-expression is extremely slow? Lol.. Please.
+
+So you want one huge global variable stuck there in the middle of it all? 
+
+Anyway, I just 'scaled' my version to add: - Xor, -Nand,  - Nor. Took NINE lines of additional code. 9!  I want to see what your consider good code and evaluate the cost
+
+Because I doubt you've even done the problem, and I certainly doubt anyone else implement the full functionality.
+All works. to an arbitrary depth,. And wow, given there's only ever One user using it, there's zilch perfomance problems.
+
+BTW: I didn't like the globalFn thing much, btw - but given the problem spec'd most of the work was logically in the expression code - which should certainly not be in the UI / React code ... (agree/disagree?).
+
+Worked first time. Trival.
+
