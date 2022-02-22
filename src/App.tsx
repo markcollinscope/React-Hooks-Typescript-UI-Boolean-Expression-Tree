@@ -118,8 +118,8 @@ class App extends React.Component<{}, State>
 
 				<ExpView
 					exp={this.visibleRoot()}
-					parentUpdateFn={this.updateDummyRoot}
-					globalUpdateFn={this.updateState}
+					parentUpdateCb={this.updateDummyRoot}
+					requestAppStateBeUpdatedCb={this.updateState}
 				/>
 			</div>
 		);
