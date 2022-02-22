@@ -22,7 +22,6 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** true/false constants to evaluate correctly', function()
 	{
-		const t =
 		assert( TRUE_EXP.calc() === true );
 		assert( FALSE_EXP.calc() === false );
 	});
