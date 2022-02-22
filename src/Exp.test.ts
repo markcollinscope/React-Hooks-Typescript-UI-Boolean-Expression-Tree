@@ -3,7 +3,7 @@ import { assert } from './utils';
 import { AppError } from './AppError'
 
 import {
-	AND_OP, OR_OP, Exp, BinExp, FALSE_EXP, TRUE_EXP, NOT_OP, UndefExpError, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
+	AndExp, OrExp, AND_OP, OR_OP, Exp, FALSE_EXP, TRUE_EXP, NOT_OP, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
 // Tests (part 1)
@@ -17,19 +17,20 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** undefined expression throw no-eval error on calc', function()
 	{
-		expect( () => UNDEF_EXP.calc() ).toThrow(UndefExpError);
+		assert(UNDEF_EXP.calc() === undefined);
 	});
 
 	it('** true/false constants to evaluate correctly', function()
 	{
-		assert( TRUE_EXP.calc() );
-		assert( ! FALSE_EXP.calc() );
+		const t =
+		assert( TRUE_EXP.calc() === true );
+		assert( FALSE_EXP.calc() === false );
 	});
 
 	it('** Not expression evaluates correctly', function()
 	{
-		assert( new NotExp(FALSE_EXP).calc() );
-		assert( ! new NotExp(TRUE_EXP).calc() );
+		assert( new NotExp(FALSE_EXP).calc() === true);
+		assert( new NotExp(TRUE_EXP).calc() === false);
 	});
 
 	it('** Not expression expands (to string representation) correctly', function()
@@ -45,56 +46,51 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** AND_OP expressions evaluation correctly', function()
 	{
-
-		assert( new BinExp( AND_OP, TRUE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( AND_OP, TRUE_EXP, FALSE_EXP ).calc() );
-		assert( ! new BinExp( AND_OP, FALSE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( AND_OP, FALSE_EXP, FALSE_EXP ).calc() );
+		assert(new AndExp(TRUE_EXP, TRUE_EXP).calc() === true );
+		assert(new AndExp(TRUE_EXP, FALSE_EXP).calc() === false );
+		assert(new AndExp(FALSE_EXP, TRUE_EXP).calc() === false);
+		assert(new AndExp(FALSE_EXP, FALSE_EXP).calc() === false);
 	});
 
 	it('** OR_OP expressions evaluation correctly', function()
 	{
-		assert( new BinExp( OR_OP, TRUE_EXP, TRUE_EXP ).calc() );
-		assert( new BinExp( OR_OP, TRUE_EXP, FALSE_EXP ).calc() );
-		assert( new BinExp( OR_OP, FALSE_EXP, TRUE_EXP ).calc() );
-		assert( ! new BinExp( OR_OP, FALSE_EXP, FALSE_EXP ).calc() );
+		assert(new OrExp(TRUE_EXP, TRUE_EXP).calc() === true);
+		assert(new OrExp(TRUE_EXP, FALSE_EXP).calc() === true);
+		assert(new OrExp(FALSE_EXP, TRUE_EXP).calc() === true);
+		assert(new OrExp(FALSE_EXP, FALSE_EXP).calc() === false);
 	});
 
 	it('** AND_OP / OR_OP expressions expand to strings correctly', function()
 	{
 		const t = TRUE_EXP.name();
 
-		assert( new BinExp( AND_OP, TRUE_EXP, TRUE_EXP ).expand() === AND_OP + LB + t + SEPERATOR + t + RB);
-		assert( new BinExp( OR_OP, TRUE_EXP, TRUE_EXP ).expand() === OR_OP + LB + t + SEPERATOR + t + RB);
+		assert( new AndExp(TRUE_EXP, TRUE_EXP).expand() === AND_OP + LB + t + SEPERATOR + t + RB);
+		assert( new OrExp(TRUE_EXP, TRUE_EXP).expand() === OR_OP + LB + t + SEPERATOR + t + RB);
 	});
 
 	it('** Deeper nested expression with UNDEF throws exception', function() 
 	{
 		const e = 
-			new BinExp( 
-				AND_OP,
-				new BinExp( 
-					OR_OP,
+			new AndExp( 
+				new OrExp( 
 					TRUE_EXP,
 					FALSE_EXP
 				)
 				// default second arg to UndefExp ...UndefExp
 			);
 
-		expect( () => e.calc() ).toThrow(UndefExpError);
+		assert(e.calc() === undefined);
 	});
 	
 	it('** Deeper nested expression expands to string correctly', function() 
 	{
 		const e = 
-			new BinExp( // AND_OP 
-				AND_OP,
-				new BinExp( // OR_OP ( T, F)
-					OR_OP, 
+			new AndExp(
+				new OrExp(
 					TRUE_EXP,
 					FALSE_EXP
 				),
-				new NotExp( FALSE_EXP ) // NOT_OP ( F )
+				new NotExp( FALSE_EXP )
 			);
 		
 		// AND_OP(OR_OP(TRUE,FALSE),NOT_OP(FALSE))
@@ -103,15 +99,13 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** Deeper nested expression evaluates correctly', function() 
 	{
-		const e = 
-			new BinExp( // TRUE
-				AND_OP,
-				new BinExp( // TRUE.
-					OR_OP, 
+		const e =
+			new AndExp(
+				new OrExp(
 					TRUE_EXP,
 					FALSE_EXP
 				),
-				new NotExp( FALSE_EXP ) // TRUE
+				new NotExp(FALSE_EXP)
 			);
 		assert( e.calc() );
 	}); 
