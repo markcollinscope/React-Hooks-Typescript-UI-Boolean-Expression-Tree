@@ -107,6 +107,6 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 				),
 				new NotExp(FALSE_EXP)
 			);
-		assert( e.calc() );
+		assert( e.calc() === true );
 	}); 
 });
