@@ -28,7 +28,6 @@ export function ConstExpView(props: Props)
 	{
 		return (
 			<option
-				//
 				className={'option-txt md-font'}
 				key={k}
 				value={k}

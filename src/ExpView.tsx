@@ -12,7 +12,7 @@ import { ConstExpView } from './ConstExpView';
 // boolean expressions - types(classes) and constants.
 // as this list has grown, "import * as exp from './Exp'" might be a better option...
 import { 
-	Exp, BinExp, NotExp, XOR_OP, NAND_OP, NOR_OP, UNDEF_EXP, TRUE_EXP, 
+	Exp, BinExp, NotExp, AndExp, OrExp, NandExp, NorExp, XorExp, XOR_OP, NAND_OP, NOR_OP, UNDEF_EXP, TRUE_EXP, 
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
@@ -64,11 +64,11 @@ const dropDownMenuExpFactor =
 	[TRUE]: 	() =>  TRUE_EXP,
 	[FALSE]: 	() =>  FALSE_EXP,
 	[NOT_OP]: 	() =>  new NotExp(),
-	[AND_OP]:	() =>  new BinExp(AND_OP),
-	[OR_OP]:	() =>  new BinExp(OR_OP),
-	[NAND_OP]: 	() =>  new BinExp(NAND_OP),
-	[NOR_OP]: 	() =>  new BinExp(NOR_OP),
-	[XOR_OP]: 	() =>  new BinExp(XOR_OP)
+	[AND_OP]:	() =>  new AndExp(),
+	[OR_OP]:	() =>  new OrExp(),
+	[NAND_OP]: 	() =>  new NandExp(),
+	[NOR_OP]: 	() =>  new NorExp(),
+	[XOR_OP]: 	() =>  new XorExp()
 } as ExpFactoryCb;
 
 // recursively instantiated React class.

@@ -1,11 +1,11 @@
-import { lg } from './utils';
+// import { lg } from './utils';
 
 // UI (Interface).
 import React from 'react';
 import { ExpView } from './ExpView'
 
 // Domain.
-import { UNDEF_EXP, Exp, NotExp, UndefExpError, TRUE, FALSE, UNDEF  } from './Exp'
+import { UNDEF_EXP, UNDEF, Exp, NotExp, TRUE, FALSE } from './Exp'
 
 /* 	dummyRoot(Exp) is the parent of the actual Exp to be shown.
     
@@ -16,12 +16,6 @@ import { UNDEF_EXP, Exp, NotExp, UndefExpError, TRUE, FALSE, UNDEF  } from './Ex
 	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' in reference form
 	for this to happen. Selecting a new option (from the dropdown menu of visibleRoot) changes the visibleRoot
 	by updating the reference held in dummyRoot.
-*/
-
-/* uncomment for PLAY option -see below
-
-import  {BinExp, FALSE_EXP, TRUE_EXP, AND_OP, OR_OP } from './Exp';
-
 */
 
 // purely for clarity of intent... no functional difference - used as a container for visibleRoot.
@@ -39,19 +33,11 @@ class App extends React.Component<{}, State>
 		const textExp = dummyRoot.getSubExp().expand();
 		let result = ''; 
 
-		try {
-			result = dummyRoot.getSubExp().calc() ? TRUE : FALSE;
-		}
-		catch (e)
-		{
-			lg('[Attempted to calculate an undefined value]');
-
-			if (e instanceof UndefExpError) 
-				result = UNDEF;
-			else
-				throw(e);	// some other error...
-		}
-
+		let r = dummyRoot.getSubExp().calc();
+		if (r === undefined) result = UNDEF;
+		else
+			result = r ? TRUE : FALSE;
+		
 		return new State(dummyRoot, result, textExp);
 	}
 
@@ -62,30 +48,13 @@ class App extends React.Component<{}, State>
 		super(props);
 
 		const startExp = UNDEF_EXP;
-		
-		/* 	PLAY: for debug or personal amusement(!), comment out UNDEF_EXP
-			and try: (nb: uncomment import marked PLAY above, as well) 
-		
-			new NotExp( 
-				new BinExp( 
-					OR_OP, 
-					new BinExp( 
-						AND_OP, 
-						new NotExp( new NotExp( new NotExp(TRUE_EXP) ) ), 
-						new NotExp(FALSE_EXP) 	
-					), 
-					FALSE_EXP 
-				) 
-			); 
-		*/
-		
 		const dummyRoot = new DummyRoot(startExp);
 		this.state = this.createState(dummyRoot);
 	}
 
 	updateState = () => 
 	{
-		lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
+		// lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
 		this.setState( this.createState(this.state.dummyRoot) );
 	}
 

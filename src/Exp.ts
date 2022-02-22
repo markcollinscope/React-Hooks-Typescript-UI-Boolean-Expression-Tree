@@ -101,12 +101,6 @@ export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
-// export const AND_OP =   'And';
-// export const OR_OP = 	'Or';
-// export const NAND_OP = 	'Nand';
-// export const NOR_OP =  	'Nor';
-// export const XOR_OP = 	'Xor';
-
 export class BinExp extends Exp
 {
 	constructor(private lhs: Exp = UNDEF_EXP, private rhs: Exp = UNDEF_EXP) { super(); }
