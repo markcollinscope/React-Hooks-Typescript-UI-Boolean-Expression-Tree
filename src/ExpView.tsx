@@ -24,7 +24,7 @@ interface Props
 
 interface State
 {
-	thisExpRoot: 	Exp;
+	expRoot: 	Exp;
 };
 
 export type ExpFactoryCb = { [index: string]: () => Exp };
@@ -49,7 +49,7 @@ export class ExpView extends React.Component<Props, State>
 		super(props);
 		this.state =
 		{
-			thisExpRoot: 	props.exp,
+			expRoot: 	props.exp,
 		}
 	}
 
@@ -58,7 +58,7 @@ export class ExpView extends React.Component<Props, State>
 		const newRoot = this.props.parentUpdateCb( dropDownMenuExpFactory[value]() );
 
 		let newState = this.state as State;
-		newState.thisExpRoot = newRoot;
+		newState.expRoot = newRoot;
 		this.setState(newState);
 		
 		// i don't like having to use this fn so much... ongoing...
@@ -67,9 +67,10 @@ export class ExpView extends React.Component<Props, State>
 
 	render()
 	{
-		// nb: this could do with a more generic mechanism.
+		// nb: this could do with a more generic, extensible mechanism.
 
-		// basic case - UNDEF, TRUE or FALSE value.
+		// basic cases - Undefined, True or False value or the 'core' part of a UI 'node' (e.g. box with
+		// And, Or, Xor in it - that also has an associated drop down menu.
 		let viewToRender = 
 			<div className='bdr md-font exp-width'>
 			<ConstExpView 

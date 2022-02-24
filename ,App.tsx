@@ -5,7 +5,7 @@ import React from 'react';
 import { ExpView } from './ExpView'
 
 // Domain.
-import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
+import { UNDEF_EXP, UNDEF, Exp, NotExp, TRUE, FALSE, uBoolToName } from './Exp'
 
 /* 	dummyRoot(Exp) is the parent of the actual Exp to be shown.
     
@@ -23,56 +23,41 @@ class DummyRoot extends NotExp {} // purely for clarity of intent - DummyRoot.
 interface State
 {
 	dummyRoot: 	DummyRoot;
-	res:		string;
+	result:		string;
 	textExp:	string;
 }
-
-const lg = (...args: any[]) => console.log(...args);
 
 class App extends React.Component<{}, State>
 {
 	visibleRoot = () => this.state.dummyRoot.getSubExp();
+	setVisibleRoot = (e: Exp) => this.state.dummyRoot.setSubExp(e);
 
-	calcRes = (e: Exp) => uBoolToName( e.calc() );
-	getExpansion = (e: Exp) => e.expand();
+	visibleResult = () => uBoolToName( this.visibleRoot().calc() );
+	setVisibleResult = () => this.state.result = this.visibleResult();
+		
+	visibleText = () => this.visibleRoot().expand();
+	setVisibleText = () => this.state.textExp = this.visibleText();
 
 	constructor(props = {})
 	{
 		super(props);
-		let dummy = new DummyRoot(UNDEF_EXP);
+		this.setVisibleRoot(new DummyRoot(UNDEF_EXP) );
 
 		this.state =
 		{
-			dummyRoot:	dummy,
-			res:		this.calcRes(dummy.getSubExp()),
-			textExp:	this.getExpansion(dummy.getSubExp())
+			dummyRoot:	dr,
+			result:		r,
+			textExp:	t
 		}
-		lg("dummy: ", this.state.dummyRoot.expand())
 	}
 
-	resetStateDependencies() 
+	updateVisibleExp = (e: Exp) =>
 	{
-		lg("(resetStateDependencies)dummy: ", this.state.dummyRoot.name())
-		
-		lg("(resetStateDependencies)2: ")
-		let newState = 
-		{
-			dummyRoot: 	this.state.dummyRoot,
-			res: 		this.calcRes( this.visibleRoot() ),
-			textExp: 	this.getExpansion( this.visibleRoot() )
-		}
+		this.setVisibleExp(e);
 
-		this.setState(newState);
-	}
-
-	updateVisibleRoot = (newExp: Exp) =>
-	{
-		this.state.dummyRoot.setSubExp(newExp);
-
-		lg("(updateVisibleRoot)dummy: ", this.state.dummyRoot.expand())
-
-		this.resetStateDependencies();
-		return newExp;
+		const newState = this.state;
+		newState.result = 
+		this.setState(this.newState(this.state.dummyRoot));
 	}
 
 	render()
@@ -90,14 +75,14 @@ class App extends React.Component<{}, State>
 					<p className=''>{this.state.textExp}</p>
 				</div>
 				<div className='tal lg-font flex-horiz bot-margin'>
-					<p className='exp-width'>Res:</p> 
-					<p className=''>{this.state.res}</p>
+					<p className='exp-width'>Result:</p> 
+					<p className=''>{this.state.result}</p>
 				</div>
 
 				<ExpView
 					exp={this.visibleRoot()}
-					parentUpdateCb={this.updateVisibleRoot}
-					requestAppStateBeUpdatedCb={this.resetStateDependencies}
+					parentUpdateCb={this.updateDummyRootChild}
+					requestAppStateBeUpdatedCb={this.newState}
 				/>
 			</div>
 		);

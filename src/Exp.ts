@@ -31,27 +31,27 @@
 import { progError } from './utils';
 
 //******
-type uboolean = true | false | undefined;
+type uBoolean = true | false | undefined;
 
 // abstract base class - which Typescript doesn't support directly, so progError()...
 export class Exp  
 {
 	name = (): string | never => progError();
 	expand = (): string | never => progError();
-	calc = (): uboolean | never => progError();
+	calc = (): uBoolean | never => progError();
 }
 
 //******
 class ConstExp extends Exp // no export - T, F immutable Exp values created and exported.
 {
-	static nameString(v: uboolean): string
+	static nameString(v: uBoolean): string
 	{
 		if (v === true) return 'True';
 		if (v === false) return 'False';
 		return 'Undefined';
 	}
 
-	constructor(private value: uboolean) { super(); }
+	constructor(private value: uBoolean) { super(); }
 	calc = () => this.value;
 	name = () => ConstExp.nameString(this.value);
 	expand = () => this.name();
@@ -65,14 +65,17 @@ export const UNDEF = UNDEF_EXP.name();
 export const TRUE = TRUE_EXP.name();
 export const FALSE = FALSE_EXP.name();
 
-const containsUndefined = (l: uboolean, r: uboolean) => (l === undefined) || (r = undefined);
+const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r = undefined);
 
+const uNot = 	(v: uBoolean) => (v === undefined) ? undefined : ! v;
+const uAnd = 	(l: uBoolean, r: uBoolean) => containsUndefined (l, r) ? undefined : l && r;
+const uOr = 	(l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
 
-const unot = (v: uboolean) => (v === undefined) ? undefined : ! v;
-const uand = (l: uboolean, r: uboolean): uboolean => containsUndefined (l, r) ? undefined : l && r;
-const uor = (l: uboolean, r: uboolean): uboolean => containsUndefined(l, r) ? undefined : l || r;
+export const uBoolToName = (v: uBoolean) => v === undefined ? UNDEF : (v ? TRUE : FALSE);
 
 //******
+const lg = (...args: any[]) => console.log(...args);
+
 export class NotExp extends Exp
 {
 	constructor(private subExp: Exp = UNDEF_EXP)
@@ -82,10 +85,13 @@ export class NotExp extends Exp
 	}
 
 	getSubExp = () => this.subExp
-	setSubExp = (e: Exp) => this.subExp = e;
+	setSubExp = (e: Exp) => {
+		lg("Not.sse: ", this.subExp.expand()); this.subExp = e; lg("Not.sse (2): ", this.subExp.expand());
+		return e;
+	}
 
 	name = () => 'Not';
-	calc = (): uboolean => unot( this.getSubExp().calc() );
+	calc = (): uBoolean => uNot( this.getSubExp().calc() );
 	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
 }
 export const NOT_OP = (new NotExp()).name();
@@ -109,36 +115,36 @@ export class BinExp extends Exp
 export class AndExp extends BinExp
 {
 	name = () => 'And';
-	calc = () => uand( this.getLhsExp().calc(), this.getRhsExp().calc() )
+	calc = () => uAnd( this.getLhsExp().calc(), this.getRhsExp().calc() )
 }
 export const AND_OP = (new AndExp()).name();
 
 export class OrExp extends BinExp
 {
 	name = () => 'Or';
-	calc = () => uor(this.getLhsExp().calc(), this.getRhsExp().calc())
+	calc = () => uOr(this.getLhsExp().calc(), this.getRhsExp().calc())
 }
 export const OR_OP = (new OrExp()).name();
 
 export class NandExp extends BinExp
 {
 	name = () => 'Nand';
-	calc = () => unot( uand(this.getLhsExp().calc(), this.getRhsExp().calc()) );
+	calc = () => uNot( uAnd(this.getLhsExp().calc(), this.getRhsExp().calc()) );
 }
 export const NAND_OP = (new NandExp()).name();
 
 export class NorExp extends BinExp {
 	name = () => 'Nor';
-	calc = () => unot( uor(this.getLhsExp().calc(), this.getRhsExp().calc()) )
+	calc = () => uNot( uOr(this.getLhsExp().calc(), this.getRhsExp().calc()) )
 }
 export const NOR_OP = (new NorExp()).name();
 
 export class XorExp extends BinExp 
 {
 	name = () => 'Xor';
-	calc = () => uor(
-		uand( this.getLhsExp().calc(), unot(this.getRhsExp().calc()) ),
-		uand( unot(this.getLhsExp().calc()), this.getRhsExp().calc() )
+	calc = () => uOr(
+		uAnd( this.getLhsExp().calc(), uNot(this.getRhsExp().calc()) ),
+		uAnd( uNot(this.getLhsExp().calc()), this.getRhsExp().calc() )
 	);
 }
 export const XOR_OP = (new XorExp()).name();
