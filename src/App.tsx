@@ -27,8 +27,6 @@ interface State
 	textExp:	string;
 }
 
-const lg = (...args: any[]) => console.log(...args);
-
 class App extends React.Component<{}, State>
 {
 	visibleRoot = () => this.state.dummyRoot.getSubExp();
@@ -47,17 +45,14 @@ class App extends React.Component<{}, State>
 			res:		this.calcRes(dummy.getSubExp()),
 			textExp:	this.getExpansion(dummy.getSubExp())
 		}
-		lg("dummy: ", this.state.dummyRoot.expand())
 	}
 
-	resetStateDependencies() 
+	resetStateDependencies = () =>
 	{
-		lg("(resetStateDependencies)dummy: ", this.state.dummyRoot.name())
-		
-		lg("(resetStateDependencies)2: ")
+		const root = this.state.dummyRoot;
 		let newState = 
 		{
-			dummyRoot: 	this.state.dummyRoot,
+			dummyRoot: 	root,
 			res: 		this.calcRes( this.visibleRoot() ),
 			textExp: 	this.getExpansion( this.visibleRoot() )
 		}
@@ -68,8 +63,6 @@ class App extends React.Component<{}, State>
 	updateVisibleRoot = (newExp: Exp) =>
 	{
 		this.state.dummyRoot.setSubExp(newExp);
-
-		lg("(updateVisibleRoot)dummy: ", this.state.dummyRoot.expand())
 
 		this.resetStateDependencies();
 		return newExp;

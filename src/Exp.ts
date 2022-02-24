@@ -28,6 +28,7 @@
 // The code here does Not deal with UI - this code is 'functional' (business) logic only.
 // It is used by the UI code to create, modify and evaluate the expressions contained herein.
 
+
 import { progError } from './utils';
 
 //******
@@ -74,8 +75,6 @@ const uOr = 	(l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined :
 export const uBoolToName = (v: uBoolean) => v === undefined ? UNDEF : (v ? TRUE : FALSE);
 
 //******
-const lg = (...args: any[]) => console.log(...args);
-
 export class NotExp extends Exp
 {
 	constructor(private subExp: Exp = UNDEF_EXP)
@@ -85,10 +84,7 @@ export class NotExp extends Exp
 	}
 
 	getSubExp = () => this.subExp
-	setSubExp = (e: Exp) => {
-		lg("Not.sse: ", this.subExp.expand()); this.subExp = e; lg("Not.sse (2): ", this.subExp.expand());
-		return e;
-	}
+	setSubExp = (e: Exp) => this.subExp = e;
 
 	name = () => 'Not';
 	calc = (): uBoolean => uNot( this.getSubExp().calc() );
