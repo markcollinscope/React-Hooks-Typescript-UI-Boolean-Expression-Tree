@@ -18,10 +18,9 @@ import { UNDEF_EXP, UNDEF, Exp, NotExp, TRUE, FALSE } from './Exp'
 	by updating the reference held in dummyRoot.
 */
 
-// purely for clarity of intent... no functional difference - used as a container for visibleRoot.
-class DummyRoot extends NotExp {}
+class DummyRoot extends NotExp {} // purely for clarity of intent - DummyRoot.
 
-class State
+interface State
 {
 	constructor(public dummyRoot: DummyRoot, public result: string, public textExp: string) {};
 }
@@ -34,9 +33,7 @@ class App extends React.Component<{}, State>
 		let result = ''; 
 
 		let r = dummyRoot.getSubExp().calc();
-		if (r === undefined) result = UNDEF;
-		else
-			result = r ? TRUE : FALSE;
+		result = (r === undefined) ? UNDEF : ( r ? TRUE : FALSE);
 		
 		return new State(dummyRoot, result, textExp);
 	}
@@ -54,7 +51,6 @@ class App extends React.Component<{}, State>
 
 	updateState = () => 
 	{
-		// lg( "App Level Tree Expansion: ", this.state.dummyRoot.expand() );
 		this.setState( this.createState(this.state.dummyRoot) );
 	}
 
