@@ -15,6 +15,9 @@ import {
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
+type ExpViewFns = 	{ exp: Exp, render: (e: Exp) => string };
+type ExpFactoryCb = { ( [index: string]: () =>  ExpViewFns };
+
 interface Props
 {
 	exp:	Exp;	// Exp being shown in 'this' instance of ExpView.
@@ -26,21 +29,6 @@ interface State
 {
 	expRoot: 	Exp;
 };
-
-export type ExpFactoryCb = { [index: string]: () => Exp };
-
-const dropDownMenuExpFactory =
-{
-	[UNDEF]:	()  => UNDEF_EXP,
-	[TRUE]: 	() =>  TRUE_EXP,
-	[FALSE]: 	() =>  FALSE_EXP,
-	[NOT_OP]: 	() =>  new NotExp(),
-	[AND_OP]:	() =>  new AndExp(),
-	[OR_OP]:	() =>  new OrExp(),
-	[NAND_OP]: 	() =>  new NandExp(),
-	[NOR_OP]: 	() =>  new NorExp(),
-	[XOR_OP]: 	() =>  new XorExp()
-} as ExpFactoryCb;
 
 export class ExpView extends React.Component<Props, State>
 {
@@ -61,24 +49,78 @@ export class ExpView extends React.Component<Props, State>
 		newState.expRoot = newRoot;
 		this.setState(newState);
 		
-		// i don't like having to use this fn so much... ongoing...
-		this.props.requestAppStateBeUpdatedCb();
+		this.props.requestAppStateBeUpdatedCb(); // this is not different to a button onClick callback...
 	}
 
 	render()
 	{
-		// nb: this could do with a more generic, extensible mechanism.
+		const renderNotExp = (e: NotExp, updateAppCalculations: () => void) => {
+			return (
+				<div>
+					<div className='vgap' />
+					<div className='lhs-margin'>
+						<ExpView
+							exp={e.getSubExp()}
+							parentUpdateCb={e.setSubExp}
+							requestAppStateBeUpdatedCb={updateAppCalculations}
+						/>
+					</div>
+				</div>
+			);
+		}
+
+		const renderBinExp = (e: BinExp, updateAppCalculations: () => void) => {
+			return (
+				<div>
+					<div className='lhs-margin'>
+						<ExpView
+							exp={e.getLhsExp()}
+							parentUpdateCb={e.setLhsExp}
+							requestAppStateBeUpdatedCb={updateAppCalculations}
+						/>
+					</div>
+					<div className='vgap' />
+					<div className='lhs-margin'>
+						<ExpView
+							exp={e.getRhsExp()}
+							parentUpdateCb={e.setRhsExp}
+							requestAppStateBeUpdatedCb={updateAppCalculations}
+						/>
+					</div>
+				</div>
+			);
+		}
+
+		renderNullExp = (e: Exp, updateAppCalculations: () => void) => {
+			return "";
+		}
+
+		const dropDownMenuExpFactory =
+		{
+			[UNDEF]: () => { exp: UNDEF_EXP, render: renderNullExp },
+			[TRUE]: () => { exp: TRUE_EXP, render: renderNullExp },
+			[FALSE]: () => { exp: FALSE_EXP, render: renderNullExp }
+			[NOT_OP]: () => { exp: new NotExp(), render: renderNotExp },
+			[AND_OP]: () => { exp: new AndExp(), render: renderBinExp },
+			[OR_OP]: () => { exp: new OrExp(), render: renderBinExp },
+			[NAND_OP]: () => { exp: new NandExp(), render: renderBinExp },
+			[NOR_OP]: () => { exp: new NorExp(), render: renderBinExp },
+			[XOR_OP]: () => { exp: new XorExp(), render: renderBinExp }
+			} as ExpFactoryCb;
+
 
 		// basic cases - Undefined, True or False value or the 'core' part of a UI 'node' (e.g. box with
 		// And, Or, Xor in it - that also has an associated drop down menu.
 		let viewToRender = 
-			<div className='bdr md-font exp-width'>
-			<ConstExpView 
-				options={ Object.keys(dropDownMenuExpFactory) }
-				onSelect={ this.handleSelectionFromDropDownMenu }
-				selected={ this.props.exp.name() }
-			/>
-			</div>
+			<div>
+				<div className='bdr md-font exp-width'>
+					<ConstExpView 
+						options={ Object.keys(dropDownMenuExpFactory.map( (k) => dropDownMenuExpFactory[k].exp )) }
+						onSelect={ this.handleSelectionFromDropDownMenu }
+						selected={ this.props.exp.name() }
+					/>
+				</div>
+				<div className='vgap' />
 
 		if (this.props.exp instanceof NotExp)
 		{

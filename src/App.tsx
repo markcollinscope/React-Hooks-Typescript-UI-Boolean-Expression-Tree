@@ -15,17 +15,10 @@ import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
 	
 	dummyRoot enables the visibleRoot to be changed dynamically - something has to 'hold it' in reference form
 	for this to happen. Selecting a new option (from the dropdown menu of visibleRoot) changes the visibleRoot
-	by updating the reference held in dummyRoot.
+	by updating the reference held in dummyRoot (or another Exp node if deeper in Exp).
 */
 
-class DummyRoot extends NotExp {} // purely for clarity of intent - DummyRoot.
-
-// interface State
-// {
-// 	dummyRoot: 	DummyRoot;
-// 	res:		string;
-// 	textExp:	string;
-// }
+class DummyRoot extends NotExp {}
 
 function App()
 {
