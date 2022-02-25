@@ -15,12 +15,12 @@ import {
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
-type ExpViewFns = 	{ exp: Exp, render: (e: Exp) => string };
-type ExpFactoryCb = { ( [index: string]: () =>  ExpViewFns };
+type ExpViewSpecifics 	= 	{ exp: Exp, render: (e: Exp) => string };
+type ExpFactoryCb 		= 	{ ( [index: string]: ExpViewSpecifics };
 
 interface Props
 {
-	exp:	Exp;	// Exp being shown in 'this' instance of ExpView.
+	exp: Exp;	// Exp being shown in 'this' instance of ExpView.
 	parentUpdateCb:	(e: Exp) => Exp;
 	requestAppStateBeUpdatedCb: () => void;
 };
