@@ -23,27 +23,30 @@
 	'inQuotes' means there is a class that will contain that value explicitly in the implementation.
 	lowerCase means there is not class for this - it's just for grammar expansion.
 	UpperCase means there's a class that does this!
-	*/
 
-// The code here does Not deal with UI - this code is 'functional' (business) logic only.
-// It is used by the UI code to create, modify and evaluate the expressions contained herein.
-
+	nb: no UI related stuff here.
+*/
 
 import { progError } from './utils';
 
 //******
 type uBoolean = true | false | undefined;
 
+const uNot = (v: uBoolean) => (v === undefined) ? undefined : !v;
+const uAnd = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l && r;
+const uOr = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
+
+//******
 // abstract base class - which Typescript doesn't support directly, so progError()...
 export class Exp  
 {
-	name = (): string | never => progError();
-	expand = (): string | never => progError();
-	calc = (): uBoolean | never => progError();
+	name = (): 		string | never => progError();
+	expand = (): 	string | never => progError();
+	calc = (): 		uBoolean | never => progError();
 }
 
 //******
-class ConstExp extends Exp // no export - T, F immutable Exp values created and exported.
+class ConstExp extends Exp
 {
 	static nameString(v: uBoolean): string
 	{
@@ -66,13 +69,8 @@ export const UNDEF = UNDEF_EXP.name();
 export const TRUE = TRUE_EXP.name();
 export const FALSE = FALSE_EXP.name();
 
-const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r = undefined);
+const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r === undefined);
 
-const uNot = 	(v: uBoolean) => (v === undefined) ? undefined : ! v;
-const uAnd = 	(l: uBoolean, r: uBoolean) => containsUndefined (l, r) ? undefined : l && r;
-const uOr = 	(l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
-
-export const uBoolToName = (v: uBoolean) => v === undefined ? UNDEF : (v ? TRUE : FALSE);
 
 //******
 export class NotExp extends Exp
@@ -145,3 +143,4 @@ export class XorExp extends BinExp
 }
 export const XOR_OP = (new XorExp()).name();
 
+export const uBoolToName = (v: uBoolean) => v === undefined ? UNDEF : (v ? TRUE : FALSE);

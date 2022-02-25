@@ -13,7 +13,7 @@ interface Props
 	selected:	string;
 }
 
-export function ConstExpView(props: Props)
+export function ExpNodePartView(props: Props)
 {
 	const optionNames = props.options;
 	const selectedItem = optionNames.indexOf(props.selected);

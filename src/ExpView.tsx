@@ -6,8 +6,9 @@
 
 // provides the UI side of Exp.ts - recursively displaying and enabling the modification 
 // at any point in the expressions hierarchy.
+
 import React from 'react';
-import { ConstExpView } from './ConstExpView';
+import { ExpNodePartView } from './ExpNodePartView';
 
 // boolean expressions - types(classes) and constants.
 import { 
@@ -15,8 +16,8 @@ import {
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
-type ExpViewSpecifics 	= 	{ exp: Exp, render: (e: Exp) => string };
-type ExpFactoryCb 		= 	{ ( [index: string]: ExpViewSpecifics };
+type ExpNameSpecificBehaviour 	= 	{ exp: Exp, display: (e: Exp, appCalc: () => void) => JSX.Element };
+type ExpNameToBehaviourMap 		= 	{ [index: string]: ExpNameSpecificBehaviour };
 
 interface Props
 {
@@ -41,20 +42,9 @@ export class ExpView extends React.Component<Props, State>
 		}
 	}
 
-	handleSelectionFromDropDownMenu = (value: string) =>
+	render() : JSX.Element
 	{
-		const newRoot = this.props.parentUpdateCb( dropDownMenuExpFactory[value]() );
-
-		let newState = this.state as State;
-		newState.expRoot = newRoot;
-		this.setState(newState);
-		
-		this.props.requestAppStateBeUpdatedCb(); // this is not different to a button onClick callback...
-	}
-
-	render()
-	{
-		const renderNotExp = (e: NotExp, updateAppCalculations: () => void) => {
+		const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Element => {
 			return (
 				<div>
 					<div className='vgap' />
@@ -69,7 +59,7 @@ export class ExpView extends React.Component<Props, State>
 			);
 		}
 
-		const renderBinExp = (e: BinExp, updateAppCalculations: () => void) => {
+		const displayBinExp = (e: BinExp, updateAppCalculations: () => void): JSX.Element => {
 			return (
 				<div>
 					<div className='lhs-margin'>
@@ -91,80 +81,48 @@ export class ExpView extends React.Component<Props, State>
 			);
 		}
 
-		renderNullExp = (e: Exp, updateAppCalculations: () => void) => {
-			return "";
+		const displayNullExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => {
+			return <div></div>;
 		}
 
-		const dropDownMenuExpFactory =
-		{
-			[UNDEF]: () => { exp: UNDEF_EXP, render: renderNullExp },
-			[TRUE]: () => { exp: TRUE_EXP, render: renderNullExp },
-			[FALSE]: () => { exp: FALSE_EXP, render: renderNullExp }
-			[NOT_OP]: () => { exp: new NotExp(), render: renderNotExp },
-			[AND_OP]: () => { exp: new AndExp(), render: renderBinExp },
-			[OR_OP]: () => { exp: new OrExp(), render: renderBinExp },
-			[NAND_OP]: () => { exp: new NandExp(), render: renderBinExp },
-			[NOR_OP]: () => { exp: new NorExp(), render: renderBinExp },
-			[XOR_OP]: () => { exp: new XorExp(), render: renderBinExp }
-			} as ExpFactoryCb;
+		const expFactory = {
+			[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNullExp },
+			[TRUE]: 	{ exp: TRUE_EXP, display: displayNullExp },
+			[FALSE]: 	{ exp: FALSE_EXP, display: displayNullExp },
+			[NOT_OP]: 	{ exp: new NotExp(), display: displayNotExp },
+			[AND_OP]: 	{ exp: new AndExp(), display: displayBinExp },
+			[OR_OP]: 	{ exp: new OrExp(), display: displayBinExp },
+			[NAND_OP]: 	{ exp: new NandExp(), display: displayBinExp },
+			[NOR_OP]: 	{ exp: new NorExp(), display: displayBinExp },
+			[XOR_OP]: 	{ exp: new XorExp(), display: displayBinExp }
+		} as ExpNameToBehaviourMap;
 
+		let self = this;
 
-		// basic cases - Undefined, True or False value or the 'core' part of a UI 'node' (e.g. box with
-		// And, Or, Xor in it - that also has an associated drop down menu.
-		let viewToRender = 
+		const handleSelectionFromDropDownMenu = (value: string) => {
+			const newRoot = this.props.parentUpdateCb(expFactory[value].exp);
+
+			let newState = self.state as State;
+			newState.expRoot = newRoot;
+			self.setState(newState);
+
+			self.props.requestAppStateBeUpdatedCb(); // React can't do this automatical
+		}
+
+		const eroot = this.state.expRoot;
+		const viewToDisplay = 
 			<div>
 				<div className='bdr md-font exp-width'>
-					<ConstExpView 
-						options={ Object.keys(dropDownMenuExpFactory.map( (k) => dropDownMenuExpFactory[k].exp )) }
-						onSelect={ this.handleSelectionFromDropDownMenu }
-						selected={ this.props.exp.name() }
+					<ExpNodePartView 
+						options=	{ Object.keys(expFactory) }
+						onSelect=	{ handleSelectionFromDropDownMenu }
+						selected=	{ this.props.exp.name() }
 					/>
 				</div>
 				<div className='vgap' />
-
-		if (this.props.exp instanceof NotExp)
-		{
-			const notExp = this.props.exp;
-			viewToRender = 
-				<div>
-					{viewToRender}
-					<div className='vgap'/>
-					<div className='lhs-margin'>
-						<ExpView
-							exp={notExp.getSubExp()}
-							parentUpdateCb={notExp.setSubExp}
-							requestAppStateBeUpdatedCb={this.props.requestAppStateBeUpdatedCb}						
-						/>
-					</div>
-				</div>
-		}
-		 
-		if (this.props.exp instanceof BinExp)
-		{
-			const binExp = this.props.exp;
-
-			viewToRender = 
-				<div>
-					{viewToRender}
-					<div className='vgap'/>
-					<div className='lhs-margin'>
-						<ExpView
-							exp={binExp.getLhsExp()}
-							parentUpdateCb={binExp.setLhsExp}
-							requestAppStateBeUpdatedCb={this.props.requestAppStateBeUpdatedCb}
-						/>
-					</div>
-					<div className='vgap'/>
-					<div className='lhs-margin'>
-						<ExpView 
-							exp={binExp.getRhsExp()}
-							parentUpdateCb={binExp.setRhsExp}
-							requestAppStateBeUpdatedCb={this.props.requestAppStateBeUpdatedCb}
-						/>
-					</div>
-				</div>
-		}
+				{expFactory[eroot.name()].display(eroot, this.props.requestAppStateBeUpdatedCb)}
+			</div>
 		
-		return viewToRender;
+		return viewToDisplay;
 	}
 }
