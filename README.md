@@ -7,7 +7,7 @@ Objective:
 * show recursive use of React components on the UI for rendering.
 * show both function (hooks) and class based UI components.
 * show the seperation of UI logic from underlying business logic (in this case, evaluation of boolean expressions) and how the two aspects of the application are integrated.
-* to support this artcile as an example: https://www.infoq.com/articles/arm-enterprise-applications
+* to support this article as an example: https://www.infoq.com/articles/arm-enterprise-applications
 
 ### RUNNING THE APP
 * use branch MAIN (lower case).
@@ -20,7 +20,7 @@ The specification for the app shown here is to:
 * it should be able to handle all the normal boolean operators, and also allow for the insertion of constant values  (true, false).
 * it should allow these to be nested to an arbitrary level.
 * it should allow for the use of 'undefined' as a constant. Any boolean expression involving an 'undefined' value should evaluate to undefined. E.g. 'And ( Undefined, True )' = 'Undefined', etc.
-* there must be a mechanism on the UI to enable the selection of any operator (And, Nand ...) and/or constant (False, Undefined) to be selected and added to the expression tree shown. 
+* there must be a mechanism on the UI to enable the selection of any operator (And, Nand ...) and/or constant (False, Undefined) and to enable this selection to be added anywhere is the pre-existing 'tree' structure shown on the UI.
 
 ### SOURCE CODE STRUCTURE (SEE src DIR)
 
