@@ -1,7 +1,7 @@
 // import { lg } from './utils';
 
 // UI (Interface).
-import React from 'react';
+import { useState } from 'react';
 import { ExpView } from './ExpView'
 
 // Domain.
@@ -20,81 +20,63 @@ import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
 
 class DummyRoot extends NotExp {} // purely for clarity of intent - DummyRoot.
 
-interface State
+// interface State
+// {
+// 	dummyRoot: 	DummyRoot;
+// 	res:		string;
+// 	textExp:	string;
+// }
+
+function App()
 {
-	dummyRoot: 	DummyRoot;
-	res:		string;
-	textExp:	string;
-}
+	const calcRes = (e: Exp) => uBoolToName( e.calc() );
+	const getExpansion = (e: Exp) => e.expand();
+	const visibleRoot = () => dummyRoot.getSubExp();
 
-class App extends React.Component<{}, State>
-{
-	visibleRoot = () => this.state.dummyRoot.getSubExp();
+	// all state.
+	const [dummyRoot, setDummyRoot] = useState(new DummyRoot(UNDEF_EXP)); 
+	const [ res, setRes ] 			= useState(calcRes(visibleRoot()));
+	const [ textExp, setTextExp] 	= useState(getExpansion(visibleRoot()));
 
-	calcRes = (e: Exp) => uBoolToName( e.calc() );
-	getExpansion = (e: Exp) => e.expand();
-
-	constructor(props = {})
+	const resetStateDependencies = () =>
 	{
-		super(props);
-		let dummy = new DummyRoot(UNDEF_EXP);
-
-		this.state =
-		{
-			dummyRoot:	dummy,
-			res:		this.calcRes(dummy.getSubExp()),
-			textExp:	this.getExpansion(dummy.getSubExp())
-		}
+		setRes( calcRes(visibleRoot()) );
+		setTextExp( getExpansion(visibleRoot()) );
 	}
 
-	resetStateDependencies = () =>
+	const updateVisibleRoot = (newExp: Exp) =>
 	{
-		const root = this.state.dummyRoot;
-		let newState = 
-		{
-			dummyRoot: 	root,
-			res: 		this.calcRes( this.visibleRoot() ),
-			textExp: 	this.getExpansion( this.visibleRoot() )
-		}
+		setDummyRoot(dummyRoot); // To get Typescript EsLint to STFU. Lol! Annoying react hooks t'ing.
 
-		this.setState(newState);
-	}
-
-	updateVisibleRoot = (newExp: Exp) =>
-	{
-		this.state.dummyRoot.setSubExp(newExp);
-
-		this.resetStateDependencies();
+		dummyRoot.setSubExp(newExp);
+		resetStateDependencies();
 		return newExp;
 	}
 
-	render()
-	{
-		return (
-			<div className="app">
-				<header className="app-header tal bot-margin">
-					De-luxe Boolean Expression Calculator
-					<p className='md-font tal'>for all your boolean evaluation needs</p>
-					<p className='md-font tal'>Thanks for upgrading - you can now use: Xor, Nand and Nor</p>
-				</header>
+	return (
+		<div className="app">
+			<header className="app-header tal bot-margin">
+				De-luxe Boolean Expression Calculator
+				<p className='md-font tal'>for all your boolean evaluation needs</p>
+				<p className='md-font tal'>Thanks for upgrading - you can now use: Xor, Nand and Nor</p>
+			</header>
 
-				<div className='tal lg-font flex-horiz'>
-					<p className='exp-width'>Expression:</p> 
-					<p className=''>{this.state.textExp}</p>
-				</div>
-				<div className='tal lg-font flex-horiz bot-margin'>
-					<p className='exp-width'>Res:</p> 
-					<p className=''>{this.state.res}</p>
-				</div>
-
-				<ExpView
-					exp={this.visibleRoot()}
-					parentUpdateCb={this.updateVisibleRoot}
-					requestAppStateBeUpdatedCb={this.resetStateDependencies}
-				/>
+			<div className='tal lg-font flex-horiz'>
+				<p className='exp-width'>Expression:</p> 
+				<p className=''>{textExp}</p>
 			</div>
-		);
-	}
+			<div className='tal lg-font flex-horiz bot-margin'>
+				<p className='exp-width'>Res:</p> 
+				<p className=''>{res}</p>
+			</div>
+
+			<ExpView
+				exp={visibleRoot()}
+				parentUpdateCb={updateVisibleRoot}
+				requestAppStateBeUpdatedCb={resetStateDependencies}
+			/>
+		</div>
+	);
 }
 
 export default App;
