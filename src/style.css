@@ -1,3 +1,25 @@
+body {
+	background-color: black;
+}
+
+p {
+	margin: 0;
+}
+
+.app {
+	text-align: center;
+	background: black;
+	color: yellow;
+	padding-left: 1vw;
+}
+
+.app-header {
+	align-items: center;
+	justify-content: center;
+	color: red;
+	font-size: 1.5vw;
+}
+
 .bot-margin {
 	margin-bottom: 3vh;
 }
@@ -15,20 +37,16 @@
 	margin: 1px;
 }
 
-.sm-font {
-	font-size: .8vw;
-}
-
 .md-font {
-	font-size: 1vw
+	font-size: 1.8vw
 }
 
 .lg-font {
-	font-size: 1.4vw	
+	font-size: 2.2vw	
 }
 
 .exp-width {
-	width: 10vw;
+	width: 15vw;
 }
 
 .lhs-margin {
