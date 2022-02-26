@@ -87,7 +87,7 @@ naming:
 * node - 16.X.X
 * npm - 8.1.0
 
-### CSS (style.css) - Currently only one style file used. This should be updated.
+### CSS (style.css) - Currently only one style file used. Prefer multiple files, but there's not enough UI yet.
 
 * App is responsive - will respond to resizing of browser window.
 * a 'micro-styles' approach has been used.
