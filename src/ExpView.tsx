@@ -47,7 +47,7 @@ export class ExpView extends React.Component<Props, State>
 		const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Element => {
 			return (
 				<div>
-					<div className='vgap' />
+					<div/>
 					<div className='lhs-margin'>
 						<ExpView
 							exp={e.getSubExp()}
@@ -69,7 +69,7 @@ export class ExpView extends React.Component<Props, State>
 							requestAppStateBeUpdatedCb={updateAppCalculations}
 						/>
 					</div>
-					<div className='vgap' />
+					<div/>
 					<div className='lhs-margin'>
 						<ExpView
 							exp={e.getRhsExp()}
@@ -81,14 +81,15 @@ export class ExpView extends React.Component<Props, State>
 			);
 		}
 
-		const displayNullExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => {
+		const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => 
+		{
 			return <div></div>;
 		}
 
 		const expFactory = {
-			[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNullExp },
-			[TRUE]: 	{ exp: TRUE_EXP, display: displayNullExp },
-			[FALSE]: 	{ exp: FALSE_EXP, display: displayNullExp },
+			[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNoSubExp },
+			[TRUE]: 	{ exp: TRUE_EXP, display: displayNoSubExp },
+			[FALSE]: 	{ exp: FALSE_EXP, display: displayNoSubExp },
 			[NOT_OP]: 	{ exp: new NotExp(), display: displayNotExp },
 			[AND_OP]: 	{ exp: new AndExp(), display: displayBinExp },
 			[OR_OP]: 	{ exp: new OrExp(), display: displayBinExp },
@@ -98,7 +99,6 @@ export class ExpView extends React.Component<Props, State>
 		} as ExpNameToBehaviourMap;
 
 		let self = this;
-
 		const handleSelectionFromDropDownMenu = (value: string) => {
 			const newRoot = this.props.parentUpdateCb(expFactory[value].exp);
 
