@@ -77,19 +77,19 @@ export function ExpView(props: Props)
 
 	const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => 
 	{
-		return <div></div>;
+		return <p></p>;
 	}
 
 	const expFactory = {
-		[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNoSubExp },
-		[TRUE]: 	{ exp: TRUE_EXP, display: displayNoSubExp },
-		[FALSE]: 	{ exp: FALSE_EXP, display: displayNoSubExp },
-		[NOT_OP]: 	{ exp: new NotExp(), display: displayNotExp },
-		[AND_OP]: 	{ exp: new AndExp(), display: displayBinExp },
-		[OR_OP]: 	{ exp: new OrExp(), display: displayBinExp },
-		[NAND_OP]: 	{ exp: new NandExp(), display: displayBinExp },
-		[NOR_OP]: 	{ exp: new NorExp(), display: displayBinExp },
-		[XOR_OP]: 	{ exp: new XorExp(), display: displayBinExp }
+		[UNDEF]: 	{ exp: UNDEF_EXP, 		display: displayNoSubExp },
+		[TRUE]: 	{ exp: TRUE_EXP, 		display: displayNoSubExp },
+		[FALSE]: 	{ exp: FALSE_EXP, 		display: displayNoSubExp },
+		[NOT_OP]: 	{ exp: new NotExp(), 	display: displayNotExp },
+		[AND_OP]: 	{ exp: new AndExp(), 	display: displayBinExp },
+		[OR_OP]: 	{ exp: new OrExp(), 	display: displayBinExp },
+		[NAND_OP]: 	{ exp: new NandExp(), 	display: displayBinExp },
+		[NOR_OP]: 	{ exp: new NorExp(), 	display: displayBinExp },
+		[XOR_OP]: 	{ exp: new XorExp(), 	display: displayBinExp }
 	} as ExpNameToBehaviourMap;
 
 	const handleSelectionFromDropDownMenu = (value: string) => {
