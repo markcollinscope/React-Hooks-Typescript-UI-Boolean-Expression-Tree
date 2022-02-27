@@ -2,7 +2,7 @@
 
 // UI (Interface).
 import { useState } from 'react';
-import { ExpView } from './ExpView'
+import { ExpView } from './ExpView';
 
 // Domain.
 import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
@@ -25,53 +25,52 @@ class DummyRoot extends NotExp {}
 function App()
 {
 	const calcRes = (e: Exp) => uBoolToName( e.calc() );
-	const getExpansion = (e: Exp) => e.expand();
 	const visibleRoot = () => dummyRoot.getSubExp();
 
 	// all state.
-	const [dummyRoot, setDummyRoot] = useState(new DummyRoot(UNDEF_EXP)); 
-	const [ res, setRes ] 			= useState(calcRes(visibleRoot()));
-	const [ textExp, setTextExp] 	= useState(getExpansion(visibleRoot()));
-
-	const resetStateDependencies = () =>
-	{
-		setRes( calcRes(visibleRoot()) );
-		setTextExp( getExpansion(visibleRoot()) );
-	}
+	const [dummyRoot,] 				= useState(new DummyRoot(UNDEF_EXP)); 
+	const [res, setRes] 			= useState(calcRes(visibleRoot()));
+	const [textExp, setTextExp] 	= useState(visibleRoot().expand());
 
 	const updateVisibleRoot = (newExp: Exp) =>
 	{
-		setDummyRoot(dummyRoot); // To get Typescript EsLint to STFU. Lol! Annoying react hooks t'ing.
-
 		dummyRoot.setSubExp(newExp);
-		resetStateDependencies();
+		updateCalcResultsArea();
 		return newExp;
 	}
 
+	const updateCalcResultsArea = () => {
+		setRes(calcRes(visibleRoot()));
+		setTextExp(visibleRoot().expand());
+	}
+
 	return (
-		<div className="app">
-			<header className="app-header tal bot-margin lg-font">
+		<div>
+			<header className="red tal bm lg-font">
 				De-luxe Boolean Expression Calculator
-				<p className='md-font tal'>for all your boolean evaluation needs</p>
+				<p className='md-font'>for all your boolean evaluation needs</p>
 				<p className='md-font tal'>Thanks for upgrading - you can now use: Xor, Nand and Nor</p>
 			</header>
 
-			<div className='tal lg-font flex-horiz'>
-				<p className='exp-width'>Expression:</p> 
-				<p className=''>{textExp}</p>
-			</div>
-			<div className='tal lg-font flex-horiz bot-margin'>
-				<p className='exp-width'>Res:</p> 
-				<p className=''>{res}</p>
-			</div>
+			<section id='resultsArea' className='orange bm'>
+				<div className='tal lg-font flex-horiz'>
+					<p className='exp-width'>Expression:</p> 
+					<p>{textExp}</p>
+				</div>
+				<div className='tal lg-font flex-horiz bm'>
+					<p className='exp-width'>Res:</p> 
+					<p>{res}</p>
+				</div>
+			</section>
 
-			<ExpView
-				exp={visibleRoot()}
-				parentUpdateCb={updateVisibleRoot}
-				requestAppStateBeUpdatedCb={resetStateDependencies}
-			/>
+			<section id='expressionArea'>
+				<ExpView
+					exp={visibleRoot()}
+					parentUpdateCb={updateVisibleRoot}
+					requestAppStateBeUpdatedCb={updateCalcResultsArea}
+				/>
+			</section>
 		</div>
 	);
 }
-
 export default App;

@@ -21,9 +21,10 @@ type ExpNameToBehaviourMap 		= 	{ [index: string]: ExpNameSpecificBehaviour };
 
 interface Props
 {
-	exp: Exp;	// Exp being shown in 'this' instance of ExpView.
-	parentUpdateCb:	(e: Exp) => Exp;
-	requestAppStateBeUpdatedCb: () => void;
+	// as shown in 'this' instance of ExpView.
+	exp: 							Exp;	
+	parentUpdateCb:					(e: Exp) => Exp;
+	requestAppStateBeUpdatedCb: 	() => void;
 };
 
 interface State
@@ -48,7 +49,7 @@ export class ExpView extends React.Component<Props, State>
 			return (
 				<div>
 					<div/>
-					<div className='lhs-margin'>
+					<div className='lhs-indent'>
 						<ExpView
 							exp={e.getSubExp()}
 							parentUpdateCb={e.setSubExp}
@@ -62,7 +63,7 @@ export class ExpView extends React.Component<Props, State>
 		const displayBinExp = (e: BinExp, updateAppCalculations: () => void): JSX.Element => {
 			return (
 				<div>
-					<div className='lhs-margin'>
+					<div className='lhs-indent'>
 						<ExpView
 							exp={e.getLhsExp()}
 							parentUpdateCb={e.setLhsExp}
@@ -70,7 +71,7 @@ export class ExpView extends React.Component<Props, State>
 						/>
 					</div>
 					<div/>
-					<div className='lhs-margin'>
+					<div className='lhs-indent'>
 						<ExpView
 							exp={e.getRhsExp()}
 							parentUpdateCb={e.setRhsExp}

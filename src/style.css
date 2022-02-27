@@ -1,26 +1,22 @@
 body {
 	background-color: black;
+	color: yellow;
+	padding-left: 2vw;
 }
 
 p {
 	margin: 0;
 }
 
-.app {
-	text-align: center;
-	background: black;
-	color: yellow;
-	padding-left: 1vw;
-}
-
-.app-header {
-	align-items: center;
-	justify-content: center;
+.red {
 	color: red;
-	font-size: 1.5vw;
 }
 
-.bot-margin {
+.orange {
+	color: orange;
+}
+
+.bm {
 	margin-bottom: 3vh;
 }
 
@@ -49,7 +45,7 @@ p {
 	width: 15vw;
 }
 
-.lhs-margin {
+.lhs-indent {
 	margin-left: 10vw;
 }
 
