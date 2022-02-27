@@ -7,7 +7,7 @@
 // provides the UI side of Exp.ts - recursively displaying and enabling the modification 
 // at any point in the expressions hierarchy.
 
-import React from 'react';
+import { useState } from 'react';
 import { ExpNodePartView } from './ExpNodePartView';
 
 // boolean expressions - types(classes) and constants.
@@ -27,103 +27,90 @@ interface Props
 	requestAppStateBeUpdatedCb: 	() => void;
 };
 
+/*
 interface State
 {
 	expRoot: 	Exp;
 };
+*/
 
-export class ExpView extends React.Component<Props, State>
+export function ExpView(props: Props)
 {
-	constructor(props: Props)
-	{
-		super(props);
-		this.state =
-		{
-			expRoot: 	props.exp,
-		}
-	}
+	const [exp, setExp] = useState(props.exp);
 
-	render() : JSX.Element
-	{
-		const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Element => {
-			return (
-				<div>
-					<div/>
-					<div className='lhs-indent'>
-						<ExpView
-							exp={e.getSubExp()}
-							parentUpdateCb={e.setSubExp}
-							requestAppStateBeUpdatedCb={updateAppCalculations}
-						/>
-					</div>
-				</div>
-			);
-		}
-
-		const displayBinExp = (e: BinExp, updateAppCalculations: () => void): JSX.Element => {
-			return (
-				<div>
-					<div className='lhs-indent'>
-						<ExpView
-							exp={e.getLhsExp()}
-							parentUpdateCb={e.setLhsExp}
-							requestAppStateBeUpdatedCb={updateAppCalculations}
-						/>
-					</div>
-					<div/>
-					<div className='lhs-indent'>
-						<ExpView
-							exp={e.getRhsExp()}
-							parentUpdateCb={e.setRhsExp}
-							requestAppStateBeUpdatedCb={updateAppCalculations}
-						/>
-					</div>
-				</div>
-			);
-		}
-
-		const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => 
-		{
-			return <div></div>;
-		}
-
-		const expFactory = {
-			[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNoSubExp },
-			[TRUE]: 	{ exp: TRUE_EXP, display: displayNoSubExp },
-			[FALSE]: 	{ exp: FALSE_EXP, display: displayNoSubExp },
-			[NOT_OP]: 	{ exp: new NotExp(), display: displayNotExp },
-			[AND_OP]: 	{ exp: new AndExp(), display: displayBinExp },
-			[OR_OP]: 	{ exp: new OrExp(), display: displayBinExp },
-			[NAND_OP]: 	{ exp: new NandExp(), display: displayBinExp },
-			[NOR_OP]: 	{ exp: new NorExp(), display: displayBinExp },
-			[XOR_OP]: 	{ exp: new XorExp(), display: displayBinExp }
-		} as ExpNameToBehaviourMap;
-
-		let self = this;
-		const handleSelectionFromDropDownMenu = (value: string) => {
-			const newRoot = this.props.parentUpdateCb(expFactory[value].exp);
-
-			let newState = self.state as State;
-			newState.expRoot = newRoot;
-			self.setState(newState);
-
-			self.props.requestAppStateBeUpdatedCb(); // React can't do this automatical
-		}
-
-		const eroot = this.state.expRoot;
-		const viewToDisplay = 
+	const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Element => {
+		return (
 			<div>
-				<div className='bdr md-font exp-width'>
-					<ExpNodePartView 
-						options=	{ Object.keys(expFactory) }
-						onSelect=	{ handleSelectionFromDropDownMenu }
-						selected=	{ this.props.exp.name() }
+				<div/>
+				<div className='lhs-indent'>
+					<ExpView
+						exp={e.getSubExp()}
+						parentUpdateCb={e.setSubExp}
+						requestAppStateBeUpdatedCb={updateAppCalculations}
 					/>
 				</div>
-				<div className='vgap' />
-				{expFactory[eroot.name()].display(eroot, this.props.requestAppStateBeUpdatedCb)}
 			</div>
-		
-		return viewToDisplay;
+		);
 	}
+
+	const displayBinExp = (e: BinExp, updateAppCalculations: () => void): JSX.Element => {
+		return (
+			<div>
+				<div className='lhs-indent'>
+					<ExpView
+						exp={e.getLhsExp()}
+						parentUpdateCb={e.setLhsExp}
+						requestAppStateBeUpdatedCb={updateAppCalculations}
+					/>
+				</div>
+				<div/>
+				<div className='lhs-indent'>
+					<ExpView
+						exp={e.getRhsExp()}
+						parentUpdateCb={e.setRhsExp}
+						requestAppStateBeUpdatedCb={updateAppCalculations}
+					/>
+				</div>
+			</div>
+		);
+	}
+
+	const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => 
+	{
+		return <div></div>;
+	}
+
+	const expFactory = {
+		[UNDEF]: 	{ exp: UNDEF_EXP, display: displayNoSubExp },
+		[TRUE]: 	{ exp: TRUE_EXP, display: displayNoSubExp },
+		[FALSE]: 	{ exp: FALSE_EXP, display: displayNoSubExp },
+		[NOT_OP]: 	{ exp: new NotExp(), display: displayNotExp },
+		[AND_OP]: 	{ exp: new AndExp(), display: displayBinExp },
+		[OR_OP]: 	{ exp: new OrExp(), display: displayBinExp },
+		[NAND_OP]: 	{ exp: new NandExp(), display: displayBinExp },
+		[NOR_OP]: 	{ exp: new NorExp(), display: displayBinExp },
+		[XOR_OP]: 	{ exp: new XorExp(), display: displayBinExp }
+	} as ExpNameToBehaviourMap;
+
+	const handleSelectionFromDropDownMenu = (value: string) => {
+		const newRoot = props.parentUpdateCb(expFactory[value].exp);
+
+		setExp(newRoot);
+		props.requestAppStateBeUpdatedCb(); // React *cannot* do this automatically!
+	}
+
+	const viewToDisplay = 
+		<div>
+			<div className='bdr md-font exp-width'>
+				<ExpNodePartView 
+					options=	{ Object.keys(expFactory) }
+					onSelect=	{ handleSelectionFromDropDownMenu }
+					selected=	{ props.exp.name() }
+				/>
+			</div>
+			<div className='vgap' />
+			{expFactory[exp.name()].display(exp, props.requestAppStateBeUpdatedCb)}
+		</div>
+		
+	return viewToDisplay;
 }

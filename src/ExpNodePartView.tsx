@@ -4,8 +4,6 @@
 // These 'nodes'also have an associated drop-down menu, which enables a new value
 // to be selected.
 
-import * as React from 'react';
-
 interface Props
 {	
 	onSelect:	(s: string) => void;
