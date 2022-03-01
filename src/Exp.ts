@@ -1,6 +1,7 @@
 // Abstraction of the concept of a boolean expression.
-// Deals with creation and calcution of such expressions, including constants values (T, F), 
-// binary operations, unary operations (well NOT_OP only at the moment), and undefined values.
+// Deals with creation and calcution of such expressions, including constants values (T, F and U), 
+// binary operations, unary operations (well NOT_OP only at the moment), and boolean logic extended to 
+// undefined values.
 
 /*
 	Here's the grammar the Exp inheritance tree conforms to (or enables) below... (BNF format-ish):
@@ -8,9 +9,9 @@
 	Exp ::= Exp | ConstExp | BinExp | NotExp
 	// UniExp - no other unary operators except Not, so no point...
 	
-	NotExp :== 'Not' Exp 
+	NotExp ::= 'Not' Exp 
 
-	BinExp :== binOp Exp Exp
+	BinExp ::= binOp Exp Exp
 	binOp ::= 'And' | 'Or' | 'Xor' | 'Nand' | 'Nor'
 
 	ConstExp ::= trueExp | falseExp | undefExp
@@ -20,9 +21,10 @@
 	trueExp ::= 'True'
 	falseExp ::= 'False'
 
-	'inQuotes' means there is a class that will contain that value explicitly in the implementation.
-	lowerCase means there is not class for this - it's just for grammar expansion.
-	UpperCase means there's a class that does this!
+	Key:-
+	'inQuotes' means the string in question can be found in the code.
+	lowerCase first letter on a name means there is not a class for this in the impl - it's just for grammar expansion.
+	UpperCase means there's a class for it in the impl.
 
 	nb: no UI related stuff here.
 */

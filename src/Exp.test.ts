@@ -4,7 +4,6 @@ import {
 	AndExp, OrExp, AND_OP, OR_OP, FALSE_EXP, TRUE_EXP, NOT_OP, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
-// Tests (part 1)
 describe(`test Exp and subclasses - creation, evaluation and expansion to string`, function()
 {
 	it('** undefined expression throw no-eval error on calc', function()

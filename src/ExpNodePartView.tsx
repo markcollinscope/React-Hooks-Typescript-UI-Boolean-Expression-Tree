@@ -1,8 +1,8 @@
 // Shows the UI 'node' part of an Exp,  
 // (the box on the UI with the name of the operator or constant, in it) e.g. 
-// |And|, |Xor| |True|
-// These 'nodes'also have an associated drop-down menu, which enables a new value
-// to be selected.
+// |And   |, |Xor   | |True  |, etc.
+// These 'nodes'also have an associated drop-down menu, which enables a new node
+// to be selected to replace the current.
 
 interface Props
 {	
