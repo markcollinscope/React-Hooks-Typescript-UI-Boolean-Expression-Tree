@@ -1,20 +1,12 @@
 import { assert } from './utils';
 
-import { AppError } from './AppError'
-
 import {
-	AndExp, OrExp, AND_OP, OR_OP, Exp, FALSE_EXP, TRUE_EXP, NOT_OP, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
+	AndExp, OrExp, AND_OP, OR_OP, FALSE_EXP, TRUE_EXP, NOT_OP, UNDEF_EXP, NotExp, LB, RB, SEPERATOR, TRUE, FALSE
 } from './Exp'
 
 // Tests (part 1)
 describe(`test Exp and subclasses - creation, evaluation and expansion to string`, function()
 {
-	it('** create exp throws app errors', function()
-	{
-		expect( () => new Exp().name() ).toThrow(AppError);
-		expect( () => new Exp().calc() ).toThrow(AppError);
-	});
-
 	it('** undefined expression throw no-eval error on calc', function()
 	{
 		assert(UNDEF_EXP.calc() === undefined);

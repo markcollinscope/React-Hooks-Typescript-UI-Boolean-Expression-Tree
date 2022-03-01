@@ -1,6 +1,7 @@
 // general purpose stuff.
 
-import { AppError } from './AppError'
+
+class AppError extends Error {};
 
 const DEBUG = false;
 export const lg = (...args: any)  => { if (DEBUG) console.log(...args); };

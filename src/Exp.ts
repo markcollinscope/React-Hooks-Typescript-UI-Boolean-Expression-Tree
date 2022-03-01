@@ -27,8 +27,6 @@
 	nb: no UI related stuff here.
 */
 
-import { progError } from './utils';
-
 //******
 type uBoolean = true | false | undefined;
 
@@ -38,11 +36,11 @@ const uOr = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : 
 
 //******
 // abstract base class - which Typescript doesn't support directly, so progError()...
-export class Exp  
+export abstract class Exp  
 {
-	name = (): 		string | never => progError();
-	expand = (): 	string | never => progError();
-	calc = (): 		uBoolean | never => progError();
+	abstract name() : 	string;
+	abstract expand(): 	string;
+	abstract calc():	uBoolean;
 }
 
 //******
@@ -71,7 +69,6 @@ export const FALSE = FALSE_EXP.name();
 
 const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r === undefined);
 
-
 //******
 export class NotExp extends Exp
 {
@@ -96,7 +93,7 @@ export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
-export class BinExp extends Exp
+export abstract class BinExp extends Exp
 {
 	constructor(private lhs: Exp = UNDEF_EXP, private rhs: Exp = UNDEF_EXP) { super(); }
 	setLhsExp = (e: Exp) => this.lhs =  e;

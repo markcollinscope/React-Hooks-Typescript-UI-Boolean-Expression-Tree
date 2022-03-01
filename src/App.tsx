@@ -24,8 +24,8 @@ class DummyRoot extends NotExp {}
 
 function App()
 {
-	const calcRes = (e: Exp) => uBoolToName( e.calc() );
 	const visibleRoot = () => dummyRoot.getSubExp();
+	const calcRes = (e: Exp) => uBoolToName(e.calc());
 
 	// all state.
 	const [dummyRoot,] 				= useState(new DummyRoot(UNDEF_EXP)); 
@@ -57,7 +57,7 @@ function App()
 					<p>{textExp}</p>
 				</div>
 				<div className='tal lg-font flex-horiz bm'>
-					<p className='exp-width'>Res:</p> 
+					<p className='exp-width'>Result:</p> 
 					<p>{res}</p>
 				</div>
 			</section>
