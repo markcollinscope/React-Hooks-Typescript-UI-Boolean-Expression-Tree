@@ -7,7 +7,6 @@
 // provides the UI side of Exp.ts - recursively displaying and enabling the modification 
 // at any point in the expressions hierarchy.
 
-import { useState } from 'react';
 import { ExpNodePartView } from './ExpNodePartView';
 
 // boolean expressions - types(classes) and constants.
@@ -81,12 +80,8 @@ interface Props {
 
 export function ExpView(props: Props)
 {
-	const [exp, setExp] = useState(props.exp);
-
 	const handleSelectionFromDropDownMenu = (value: string) => {
-		const newRoot = props.parentUpdateCb(expFactory[value].exp());
-
-		setExp(newRoot);
+		props.parentUpdateCb(expFactory[value].exp());
 		props.requestAppStateBeUpdatedCb(); // React *cannot* do this automatically!
 	}
 
@@ -99,8 +94,8 @@ export function ExpView(props: Props)
 					selected=	{ props.exp.name() }
 				/>
 			</div>
-			<div className='vgap' />
-			{expFactory[exp.name()].display(exp, props.requestAppStateBeUpdatedCb)}
+			<div/>
+			{expFactory[props.exp.name()].display(props.exp, props.requestAppStateBeUpdatedCb)}
 		</div>
 		
 	return viewToDisplay;
