@@ -9,7 +9,7 @@ Objective:
 * to support this article as an example: https://www.infoq.com/articles/arm-enterprise-applications
 
 ### RUNNING THE APP
-* use tagged version: *..._V1.0.0_ReactHooks_GITREL* - that is aligned with this README.
+* use tagged version: 22.03.01-23.14_V1.0.0_GITREL - that is aligned with this README.
 * 'npm start' - to start the development server - listen on localhost:3000 (should auto-start browser).
 * 'npm test' - to run the domain level unit tests (Exp.test.ts). Uses 'jest' (sort of...)
 * nb: will have to run npm install... (no effort has been made to distinguish runtime versus dev dependencies here)
