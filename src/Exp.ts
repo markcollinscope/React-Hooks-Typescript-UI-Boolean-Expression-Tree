@@ -37,7 +37,7 @@ const uAnd = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined :
 const uOr = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
 
 //******
-// abstract base class - which Typescript doesn't support directly, so progError()...
+// abstract base class.
 export abstract class Exp  
 {
 	abstract name() : 	string;

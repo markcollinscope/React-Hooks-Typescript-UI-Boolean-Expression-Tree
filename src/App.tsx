@@ -32,8 +32,11 @@ function App()
 	const [res, setRes] 			= useState(calcRes(visibleRoot()));
 	const [textExp, setTextExp] 	= useState(visibleRoot().expand());
 
+	console.log(`App Fn Render, res: ${res}, text: ${textExp}`)
+
 	const updateVisibleRoot = (newExp: Exp) =>
 	{
+		console.log(`App Fn updateVisibleRoot Exp.name: ${newExp.name()}`)
 		dummyRoot.setSubExp(newExp);
 		updateCalcResultsArea();
 		return newExp;

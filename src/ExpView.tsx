@@ -78,10 +78,13 @@ interface Props {
 	requestAppStateBeUpdatedCb: () => void;
 };
 
-export function ExpView(props: Props)
-{
+export function ExpView(props: Props) {
+	console.log(`ExpView Fn Render, props.exp: ${props.exp.name()}`)
+
 	const handleSelectionFromDropDownMenu = (value: string) => {
-		props.parentUpdateCb(expFactory[value].exp());
+		const e = expFactory[value].exp();
+		props.parentUpdateCb(e);
+		console.log(`ExpView updated parent with: ${e.name()}`)
 		props.requestAppStateBeUpdatedCb(); // React *cannot* do this automatically!
 	}
 
