@@ -7,9 +7,10 @@
 // provides the UI side of Exp.ts - recursively displaying and enabling the modification 
 // at any point in the expressions hierarchy.
 
+import { assert } from './utils';
 import { ExpNodePartView } from './ExpNodePartView';
 
-// boolean expressions - types(classes) and constants.
+// boolean expressions - types(classes), Exp constants, operator values (also constants) and T, F, U values.
 import { 
 	Exp, BinExp, NotExp, AndExp, OrExp, NandExp, NorExp, XorExp, XOR_OP, NAND_OP, NOR_OP, UNDEF_EXP, TRUE_EXP, 
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
@@ -58,7 +59,8 @@ const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element
 	return <p></p>;
 }
 
-type ExpNameSpecificBehaviour = { exp: () => Exp, display: (e: Exp, appCalc: () => void) => JSX.Element };
+// exported to enable module extension externally.
+export type ExpNameSpecificBehaviour = { exp: () => Exp, display: (e: Exp, appCalc: () => void) => JSX.Element };
 type ExpNameToBehaviourMap = { [index: string]: ExpNameSpecificBehaviour };
 
 const expFactory = {
@@ -104,4 +106,11 @@ export function ExpView(props: Props) {
 		</div>
 		
 	return viewToDisplay;
+}
+
+// enable extension of module externally.
+export function extendExpFactory( name: string, behaviour: ExpNameSpecificBheaviour )
+{
+	assert(expFactory[name] === undefined);	// pre-conditions check.
+	expFactory[name] = behaviour;
 }

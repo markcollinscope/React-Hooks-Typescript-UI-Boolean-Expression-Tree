@@ -35,7 +35,7 @@ import {  uBoolean, uNot, uAnd, uOr, uBoolToName } from './ubool';
 export {  uNot, uAnd, uOr, TRUE, FALSE, UNDEF, uBoolToName } from './ubool';
 
 //******
-export abstract class Exp  
+export abstract class Exp
 {
 	constructor(private op: string) {};	// save operator type
 	name = () => this.op;				// what is the name of the Exp's operator. Concrete impl, all Exp types.

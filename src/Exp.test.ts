@@ -6,7 +6,7 @@ import {
 
 describe(`test Exp and subclasses - creation, evaluation and expansion to string`, function()
 {
-	it('** undefined expression throw no-eval error on calc', function()
+	it('** undefined expression value on calc is undefined!', function()
 	{
 		assert(UNDEF_EXP.calc() === undefined);
 	});
@@ -29,7 +29,7 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 		const fname = f.name();
 
 		const not = new NotExp(f);
-		const notname = not.name();
+		const notname = NOT_OP
 
 		assert( not.expand() === notname + LB + fname + RB );
 	});
@@ -52,13 +52,13 @@ describe(`test Exp and subclasses - creation, evaluation and expansion to string
 
 	it('** AND_OP / OR_OP expressions expand to strings correctly', function()
 	{
-		const t = TRUE_EXP.name();
+		const t = TRUE;
 
 		assert( new AndExp(TRUE_EXP, TRUE_EXP).expand() === AND_OP + LB + t + SEPERATOR + t + RB);
 		assert( new OrExp(TRUE_EXP, TRUE_EXP).expand() === OR_OP + LB + t + SEPERATOR + t + RB);
 	});
 
-	it('** Deeper nested expression with UNDEF throws exception', function() 
+	it('** Deeper nested expression with UNDEF evaluates to undefined', function() 
 	{
 		const e = 
 			new AndExp( 
