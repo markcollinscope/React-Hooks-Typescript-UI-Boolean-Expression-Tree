@@ -15,7 +15,8 @@ import {
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
-const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Element => {
+const displayUniExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
+	let e = expv as NotExp;
 	return (
 		<div>
 			<div />
@@ -30,7 +31,8 @@ const displayNotExp = (e: NotExp, updateAppCalculations: () => void): JSX.Elemen
 	);
 }
 
-const displayBinExp = (e: BinExp, updateAppCalculations: () => void): JSX.Element => {
+const displayBinExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
+	let e = expv as BinExp;
 	return (
 		<div>
 			<div className='lhs-indent'>
@@ -63,7 +65,7 @@ const expFactory = {
 	[UNDEF]: 		{ exp: () => UNDEF_EXP, 	display: displayNoSubExp },
 	[TRUE]: 		{ exp: () => TRUE_EXP, 		display: displayNoSubExp },
 	[FALSE]: 		{ exp: () => FALSE_EXP, 	display: displayNoSubExp },
-	[NOT_OP]: 		{ exp: () => new NotExp(), 	display: displayNotExp },
+	[NOT_OP]: 		{ exp: () => new NotExp(), 	display: displayUniExp },
 	[AND_OP]: 		{ exp: () => new AndExp(), 	display: displayBinExp },
 	[OR_OP]: 		{ exp: () => new OrExp(), 	display: displayBinExp },
 	[NAND_OP]: 		{ exp: () => new NandExp(), display: displayBinExp },

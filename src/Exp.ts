@@ -30,116 +30,129 @@
 */
 
 //******
-type uBoolean = true | false | undefined;
+export type uBoolean = true | false | undefined;
 
-const uNot = (v: uBoolean) => (v === undefined) ? undefined : !v;
-const uAnd = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l && r;
-const uOr = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
+const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r === undefined);
 
-//******
-// abstract base class.
-export abstract class Exp  
+export const uNot = (v: uBoolean) => (v === undefined) ? undefined : !v;
+export const uAnd = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l && r;
+export const uOr = (l: uBoolean, r: uBoolean) => containsUndefined(l, r) ? undefined : l || r;
+
+export const TRUE = 'True'
+export const FALSE = 'False'
+export const UNDEF = 'Undefined'
+
+export const uBoolToName = (value: uBoolean ) =>
 {
-	abstract name() : 	string;
-	abstract expand(): 	string;
-	abstract calc():	uBoolean;
+	if (value ===  true ) return TRUE;
+	if (value === false) return FALSE;
+	return UNDEF;
 }
 
 //******
-class ConstExp extends Exp
+export abstract class Exp  
 {
-	static nameString(v: uBoolean): string
-	{
-		if (v === true) return 'True';
-		if (v === false) return 'False';
-		return 'Undefined';
-	}
+	constructor(private op: string) {};	// save operator type
+	name = () => this.op;				// what is the name of the Exp's operator. Concrete impl, all Exp types.
+	abstract expand(): 	string;				// return a string expansion of the Exp.
+	abstract calc():	uBoolean;			// calculate the value of the Exp.
+}
 
-	constructor(private value: uBoolean) { super(); }
+//******
+class ConstExp extends Exp	// nb: not exported. Only pre-defined constants are exported.
+{
+	constructor(private value: uBoolean) { super( uBoolToName(value) ); }
 	calc = () => this.value;
-	name = () => ConstExp.nameString(this.value);
 	expand = () => this.name();
 }
 
+/* standard constant expression values - exported */
 export const UNDEF_EXP = 	new ConstExp(undefined);
 export const TRUE_EXP = 	new ConstExp(true);
 export const FALSE_EXP = 	new ConstExp(false);
 
-export const UNDEF = UNDEF_EXP.name();
-export const TRUE = TRUE_EXP.name();
-export const FALSE = FALSE_EXP.name();
+const DEFAULT_EXP = UNDEF_EXP;	// default parameter/argument value - not absolutely necessary.
 
-const containsUndefined = (l: uBoolean, r: uBoolean) => (l === undefined) || (r === undefined);
-
-//******
-export class NotExp extends Exp
-{
-	constructor(private subExp: Exp = UNDEF_EXP)
-	{
-		super()
-		this.setSubExp(subExp)
-	}
-
-	getSubExp = () => this.subExp
-	setSubExp = (e: Exp) => this.subExp = e;
-
-	name = () => 'Not';
-	calc = (): uBoolean => uNot( this.getSubExp().calc() );
-	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
-}
-export const NOT_OP = (new NotExp()).name();
-
-//******
-// exported for tests (only). for formatting expressions.
 export const LB = ' ( ';
 export const RB = ' ) ';
 export const SEPERATOR = ' , ';
 
+export abstract class UniExp extends Exp
+{
+	constructor(private operatorValue: string, private subExp: Exp)
+	{
+		super(operatorValue);
+		this.setSubExp(subExp);
+	}
+
+	/*  Std Exp Ops */
+	expand = () => this.name() + LB + this.getSubExp().expand() + RB;
+	
+	/* Unary Exp Specific Ops */
+	getSubExp = () => this.subExp
+	setSubExp = (e: Exp) => this.subExp = e;
+}
+
 export abstract class BinExp extends Exp
 {
-	constructor(private lhs: Exp = UNDEF_EXP, private rhs: Exp = UNDEF_EXP) { super(); }
+	constructor(operator: string, private lhs: Exp, private rhs: Exp) 
+	{ 
+		super(operator); 
+	}
+
+	/* Std Exp Ops - nb: No calc() as don't know how to calc() in abstract BinExp type  */
+	expand = () => this.name() + LB + this.getLhsExp().expand() + SEPERATOR + this.getRhsExp().expand() + RB;
+	
+	/* BinExp only ops - i.e. only make sense for binary operators / expression nodes */
+	// simple setters/getters - nb: these are implementations that all binary expressions will share.
+	// here binary expression means any class derived from (extend-ing) BinExp
 	setLhsExp = (e: Exp) => this.lhs =  e;
 	setRhsExp = (e: Exp) => this.rhs =  e;
-	getLhsExp = () => this.lhs
-	getRhsExp = () => this.rhs
-	expand = () => this.name() + LB + this.getLhsExp().expand() + SEPERATOR + this.getRhsExp().expand() + RB;
+	getLhsExp = () => this.lhs;
+	getRhsExp = () => this.rhs;
 }
 
+export const NOT_OP = 'Not' as string;
+export class NotExp extends UniExp
+{
+	constructor(subExp: Exp = DEFAULT_EXP) { super(NOT_OP, subExp); }
+	calc = (): uBoolean => uNot( this.getSubExp().calc() );
+}
+
+export const AND_OP = 'And' as string;
 export class AndExp extends BinExp
 {
-	name = () => 'And';
+	constructor(lhs: Exp = DEFAULT_EXP, rhs: Exp = DEFAULT_EXP) { super (AND_OP, lhs, rhs); }
 	calc = () => uAnd( this.getLhsExp().calc(), this.getRhsExp().calc() )
 }
-export const AND_OP = (new AndExp()).name();
 
+export const OR_OP = 'Or' as string
 export class OrExp extends BinExp
 {
-	name = () => 'Or';
+	constructor(lhs: Exp = DEFAULT_EXP, rhs: Exp = DEFAULT_EXP) { super (OR_OP, lhs, rhs); }
 	calc = () => uOr(this.getLhsExp().calc(), this.getRhsExp().calc())
 }
-export const OR_OP = (new OrExp()).name();
 
+export const NAND_OP = 'Nand' as string;
 export class NandExp extends BinExp
 {
-	name = () => 'Nand';
+	constructor(lhs: Exp = DEFAULT_EXP, rhs: Exp = DEFAULT_EXP) { super (NAND_OP, lhs, rhs); }
 	calc = () => uNot( uAnd(this.getLhsExp().calc(), this.getRhsExp().calc()) );
 }
-export const NAND_OP = (new NandExp()).name();
 
-export class NorExp extends BinExp {
-	name = () => 'Nor';
+export const NOR_OP = 'Nor' as string;
+export class NorExp extends BinExp
+{
+	constructor(lhs: Exp = DEFAULT_EXP, rhs: Exp = DEFAULT_EXP) { super (NOR_OP, lhs, rhs); }
 	calc = () => uNot( uOr(this.getLhsExp().calc(), this.getRhsExp().calc()) )
 }
-export const NOR_OP = (new NorExp()).name();
 
+export const XOR_OP = 'Xor' as string;
 export class XorExp extends BinExp 
 {
-	name = () => 'Xor';
+	constructor(lhs: Exp = DEFAULT_EXP, rhs: Exp = DEFAULT_EXP) { super (XOR_OP, lhs, rhs); }
 	calc = () => uOr(
-		uAnd( this.getLhsExp().calc(), uNot(this.getRhsExp().calc()) ),
+ 		uAnd( this.getLhsExp().calc(), uNot(this.getRhsExp().calc()) ),
 		uAnd( uNot(this.getLhsExp().calc()), this.getRhsExp().calc() )
 	);
 }
-export const XOR_OP = (new XorExp()).name();
-
-export const uBoolToName = (v: uBoolean) => v === undefined ? UNDEF : (v ? TRUE : FALSE);
