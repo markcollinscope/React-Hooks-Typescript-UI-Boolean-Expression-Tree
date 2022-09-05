@@ -1,4 +1,8 @@
-//  Extend the basic behaviour of the application without changing any core source code.
+// Extend the basic behaviour of the application without changing any core source code.
+
+// Very arguably, this module should be split into two - a) EqExp class b) eqExtension related. 
+// As they are different concerns...
+// However, left like this for now.
 
 import { Exp, BinExp, DEFAULT_EXP } from './Exp';
 import { displayBinExp, extendExpFactory } from './ExpView';
