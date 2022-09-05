@@ -3,6 +3,7 @@
 // UI (Interface).
 import { useState } from 'react';
 import { ExpView } from './ExpView';
+import { eqExtensionFn } from './extendExp';
 
 // Domain.
 import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
@@ -21,6 +22,8 @@ import { UNDEF_EXP, Exp, NotExp, uBoolToName } from './Exp'
 */
 
 class DummyRoot extends NotExp {}
+
+eqExtensionFn();	// extend functionality.
 
 function App()
 {

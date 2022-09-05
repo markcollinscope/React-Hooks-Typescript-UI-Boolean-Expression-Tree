@@ -16,7 +16,7 @@ import {
 	FALSE_EXP, NOT_OP, AND_OP, OR_OP, UNDEF, TRUE, FALSE
 } from './Exp';
 
-const displayUniExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
+export const displayUniExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
 	let e = expv as NotExp;
 	return (
 		<div>
@@ -32,7 +32,7 @@ const displayUniExp = (expv: Exp, updateAppCalculations: () => void): JSX.Elemen
 	);
 }
 
-const displayBinExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
+export const displayBinExp = (expv: Exp, updateAppCalculations: () => void): JSX.Element => {
 	let e = expv as BinExp;
 	return (
 		<div>
@@ -55,7 +55,7 @@ const displayBinExp = (expv: Exp, updateAppCalculations: () => void): JSX.Elemen
 	);
 }
 
-const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => {
+export const displayNoSubExp = (e: Exp, updateAppCalculations: () => void): JSX.Element => {
 	return <p></p>;
 }
 
@@ -104,12 +104,12 @@ export function ExpView(props: Props) {
 			<div/>
 			{expFactory[props.exp.name()].display(props.exp, props.requestAppStateBeUpdatedCb)}
 		</div>
-		
+
 	return viewToDisplay;
 }
 
 // enable extension of module externally.
-export function extendExpFactory( name: string, behaviour: ExpNameSpecificBheaviour )
+export function extendExpFactory( name: string, behaviour: ExpNameSpecificBehaviour )
 {
 	assert(expFactory[name] === undefined);	// pre-conditions check.
 	expFactory[name] = behaviour;

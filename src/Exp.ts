@@ -56,7 +56,7 @@ export const UNDEF_EXP = 	new ConstExp(undefined);
 export const TRUE_EXP = 	new ConstExp(true);
 export const FALSE_EXP = 	new ConstExp(false);
 
-const DEFAULT_EXP = UNDEF_EXP;	// default parameter/argument value - not absolutely necessary.
+export const DEFAULT_EXP = UNDEF_EXP;	// default parameter/argument value - not absolutely necessary.
 
 export const LB = ' ( ';
 export const RB = ' ) ';
