@@ -9,7 +9,7 @@ Objective:
 * to support this article as an example: https://www.infoq.com/articles/arm-enterprise-applications
 
 ### RUNNING THE APP
-* use tagged version: 22.03.01-23.14_V1.0.0_GITREL - that is aligned with this README.
+* use tagged version: 22.11.12-20.17_GITREL_V1.1.0 - that is aligned with this README.
 * 'npm start' - to start the development server - listen on localhost:3000 (should auto-start browser).
 * 'npm test' - to run the domain level unit tests (Exp.test.ts). Uses 'jest' (sort of...)
 * nb: will have to run npm install... (no effort has been made to distinguish runtime versus dev dependencies here)
@@ -30,6 +30,7 @@ The specification for the app shown here is to:
 App.tsx (interface) [----> Exp too]
    |  
    |
+   V
 ExpView.tsx (interface)             Exp.test.ts (test)
    |                                        |
    |->ExpNodePartView.tsx (interface)       |
@@ -57,6 +58,9 @@ In terms of the article here: https://www.infoq.com/articles/arm-enterprise-appl
 * Exp - Domain (nb: there is no 'application' strata in this app, it is too small.
 * utils - InfraStructure.
 * React, Typescript libs, etc - Platform.
+
+NB: 'extendExp.ts' was something of an afterthought - and was basically added to show how the whole application can be extended (in this case to add a new operator - '==' equivalence - without the modification of existing code. i.e. it follows the modern interpretation of the 
+Open Closed Principle (OCP). Bottle of wine for the first person to point out what is wrong with 'extendExp.ts' as it stands, from a design perspective!
 
 
 ### CODE PARADIGMS USED.
