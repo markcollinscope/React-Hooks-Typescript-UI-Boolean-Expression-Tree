@@ -77,7 +77,7 @@ import mechanism:
 
 naming:
 * Class (capital first letter for name)
-* variableOfSomeSort (lower case, camel-case style
+* variableOfSomeSort (lower case, camel-case style)
 * CONSTANT_IMMUTABLE_VALUE (intention is these values can't [and shouldn't] be changed).
 
 ### TEST CODE (xxxx.test.ts - TEST CODE FOR MODULE xxxx.ts)
