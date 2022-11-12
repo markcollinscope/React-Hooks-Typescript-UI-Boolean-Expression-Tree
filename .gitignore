@@ -4,7 +4,10 @@
 /.pnp
 .pnp.js
 
-# testing
+
+node_modules/.cache/
+
+ testing
 /coverage
 
 # production
